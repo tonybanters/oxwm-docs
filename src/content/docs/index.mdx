@@ -1,0 +1,64 @@
+---
+title: oxwm
+description: A lightweight, dynamic X11 window manager written in Rust.
+template: splash
+hero:
+  tagline: A lightweight, dynamic X11 window manager written in Rust with hot-reload configuration, multi-monitor support, and customizable status bar.
+  actions:
+    - text: Get Started
+      link: /getting-started/installation/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/tonybanters/oxwm
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Features
+
+<CardGrid stagger>
+	<Card title="Dynamic Tiling" icon="laptop">
+		Master/stack tiling layout with configurable gaps and automatic window arrangement. Switch to floating mode when you need it.
+	</Card>
+	<Card title="Hot Reload" icon="refresh">
+		Modify your configuration and reload instantly with Mod+Shift+R. No need to restart your session.
+	</Card>
+	<Card title="Multi-Monitor" icon="screen">
+		First-class multi-monitor support with Xinerama. Independent tag selection and per-monitor fullscreen.
+	</Card>
+	<Card title="Customizable Status Bar" icon="setting">
+		Modular status bar with built-in blocks for time, RAM, battery, and shell commands. Fully customizable colors and intervals.
+	</Card>
+	<Card title="Tag-Based Workspaces" icon="document">
+		Organize windows with tag-based workspaces. Tags persist across WM restarts.
+	</Card>
+	<Card title="Keychord Support" icon="keyboard">
+		Single-key bindings and multi-key sequences (keychords). International keyboard support via keysyms.
+	</Card>
+</CardGrid>
+
+## Quick Start
+
+```bash
+# Install oxwm
+cargo install --git https://github.com/tonybanters/oxwm
+
+# Generate default config
+oxwm --init
+
+# Edit your config
+$EDITOR ~/.config/oxwm/config.ron
+
+# Start oxwm (add to your .xinitrc or select from display manager)
+exec oxwm
+```
+
+## Why oxwm?
+
+- **Rust Performance**: Built with Rust for safety and speed
+- **RON Configuration**: Human-readable configuration with preprocessor support
+- **Lightweight**: Minimal resource usage with efficient X11 handling
+- **Active Development**: Regular updates and bug fixes
