@@ -8,6 +8,19 @@ export default defineConfig({
 		starlight({
 			title: 'oxwm',
 			description: 'A lightweight, dynamic X11 window manager written in Rust',
+			customCss: [
+				'./src/styles/custom.css',
+			],
+			defaultLocale: 'root',
+			locales: {
+				root: {
+					label: 'English',
+					lang: 'en',
+				},
+			},
+			components: {
+				ThemeSelect: './src/components/ThemeSelect.astro',
+			},
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/tonybanters/oxwm' }
 			],

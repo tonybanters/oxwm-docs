@@ -3,14 +3,14 @@ title: Configuration Overview
 description: Understanding oxwm configuration
 ---
 
-oxwm uses a human-readable configuration file written in RON (Rusty Object Notation) format with a custom preprocessor for variables.
+oxwm uses a human-readable configuration file written in Lua, a lightweight and flexible scripting language.
 
 ## Configuration File Location
 
 The configuration file is located at:
 
 ```
-~/.config/oxwm/config.ron
+~/.config/oxwm/config.lua
 ```
 
 This follows the XDG Base Directory specification.
@@ -30,8 +30,18 @@ If a config already exists, it will be backed up with a timestamp.
 You can specify a custom configuration file:
 
 ```bash
-oxwm --config /path/to/custom/config.ron
+oxwm --config /path/to/custom/config.lua
 ```
+
+## Migrating from RON
+
+If you have an existing RON configuration, oxwm provides an automatic migration tool:
+
+```bash
+oxwm --migrate
+```
+
+This will convert your `config.ron` to `config.lua`, preserving all settings and creating a backup of the old file.
 
 ## Hot Reloading
 
@@ -45,105 +55,130 @@ Your changes take effect immediately without restarting your X session or losing
 
 ## Configuration Structure
 
-The config file is a single RON struct with the following main sections:
+The config file is a Lua table that you return with the following main sections:
 
-```ron
-(
-    // Appearance
-    border_width: 2,
-    border_focused: 0x6dade3,
-    border_unfocused: 0xbbbbbb,
-    font: "monospace:style=Bold:size=10",
+```lua
+return {
+    -- Appearance
+    border_width = 2,
+    border_focused = "#6dade3",
+    border_unfocused = "#bbbbbb",
+    font = "monospace:style=Bold:size=10",
 
-    // Window gaps
-    gaps_enabled: true,
-    gap_inner_horizontal: 5,
-    gap_inner_vertical: 5,
-    gap_outer_horizontal: 5,
-    gap_outer_vertical: 5,
+    -- Window gaps
+    gaps_enabled = true,
+    gap_inner_horizontal = 5,
+    gap_inner_vertical = 5,
+    gap_outer_horizontal = 5,
+    gap_outer_vertical = 5,
 
-    // Basics
-    terminal: "st",
-    modkey: Mod4,
+    -- Basics
+    terminal = "st",
+    modkey = "Mod4",
 
-    // Tags (workspaces)
-    tags: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    -- Tags (workspaces)
+    tags = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
 
-    // Layout configuration
-    layout_symbols: [
-        (name: "tiling", symbol: "[T]"),
-        (name: "normie", symbol: "[F]"),
-    ],
+    -- Layout configuration
+    layout_symbols = {
+        { name = "tiling", symbol = "[T]" },
+        { name = "normie", symbol = "[F]" },
+    },
 
-    // Keybindings
-    keybindings: [
-        // ... keybinding definitions
-    ],
+    -- Keybindings
+    keybindings = {
+        -- ... keybinding definitions
+    },
 
-    // Status bar
-    status_blocks: [
-        // ... status block definitions
-    ],
+    -- Status bar
+    status_blocks = {
+        -- ... status block definitions
+    },
 
-    // Color schemes
-    scheme_normal: (foreground: 0xbbbbbb, background: 0x1a1b26, underline: 0x444444),
-    scheme_occupied: (foreground: 0x0db9d7, background: 0x1a1b26, underline: 0x0db9d7),
-    scheme_selected: (foreground: 0x0db9d7, background: 0x1a1b26, underline: 0xad8ee6),
-)
+    -- Color schemes
+    scheme_normal = { foreground = "#bbbbbb", background = "#1a1b26", underline = "#444444" },
+    scheme_occupied = { foreground = "#0db9d7", background = "#1a1b26", underline = "#0db9d7" },
+    scheme_selected = { foreground = "#0db9d7", background = "#1a1b26", underline = "#ad8ee6" },
+}
 ```
 
-## Preprocessor Variables
+## Variables and Modularization
 
-oxwm's config preprocessor supports variable definitions for reducing repetition:
+Lua's native features make configs clean and maintainable:
 
-```ron
-#DEFINE $terminal = "alacritty"
-#DEFINE $mod = Mod4
-#DEFINE $color_blue = 0x6dade3
+```lua
+local terminal = "alacritty"
+local modkey = "Mod4"
+local color_blue = "#6dade3"
 
-(
-    terminal: $terminal,
-    modkey: $mod,
-    border_focused: $color_blue,
+return {
+    terminal = terminal,
+    modkey = modkey,
+    border_focused = color_blue,
 
-    keybindings: [
-        (modifiers: [$mod], key: Return, action: Spawn, arg: $terminal),
-    ],
-)
+    keybindings = {
+        { modifiers = { modkey }, key = "Return", action = "Spawn", arg = terminal },
+    },
+}
 ```
 
-Variables must be defined before use with the `#DEFINE` directive.
+You can also split your config into multiple files using `require()`:
+
+```lua
+-- keybindings.lua
+return {
+    { modifiers = { "Mod4" }, key = "Return", action = "Spawn", arg = "st" },
+    -- ... more keybindings
+}
+
+-- config.lua
+local keybindings = require("keybindings")
+
+return {
+    modkey = "Mod4",
+    keybindings = keybindings,
+}
+```
 
 ## Color Format
 
-Colors use hexadecimal format with 24-bit RGB:
+Colors can be specified in two formats:
 
-```ron
-0xRRGGBB
+```lua
+-- Hexadecimal with 0x prefix (like in C)
+border_focused = 0x6dade3
 
-// Examples:
-0x6dade3  // Light blue
-0xff0000  // Red
-0x00ff00  // Green
-0x0000ff  // Blue
-0x1a1b26  // Dark gray
-0xffffff  // White
+-- Or as strings with # prefix
+border_focused = "#6dade3"
+
+-- Examples:
+"#6dade3"  -- Light blue
+"#ff0000"  -- Red
+"#00ff00"  -- Green
+"#0000ff"  -- Blue
+"#1a1b26"  -- Dark gray
+"#ffffff"  -- White
 ```
+
+Both formats work identically - use whichever you prefer!
 
 ## Comments
 
-Use `//` for single-line comments:
+Use `--` for single-line comments:
 
-```ron
-// This is a comment
-border_width: 2,  // This is also a comment
+```lua
+-- This is a comment
+border_width = 2,  -- This is also a comment
+
+--[[ This is a
+     multi-line comment ]]
 ```
 
 ## Configuration Sections
 
 Explore each section in detail:
 
-- [Config File Format](/configuration/format/) - RON syntax and structure
+- [Config File Format](/configuration/format/) - Lua syntax and structure
 - [Appearance](/configuration/appearance/) - Borders, gaps, colors, fonts
 - [Keybindings](/configuration/keybindings/) - Custom keyboard shortcuts
 - [Status Bar](/configuration/status-bar/) - Status bar blocks and customization
@@ -152,16 +187,22 @@ Explore each section in detail:
 
 If oxwm fails to start after a config change:
 
-1. Check for syntax errors in your RON file
+1. Check for syntax errors in your Lua file
 2. Ensure all required fields are present
-3. Verify hex color codes are valid (6 digits after `0x`)
-4. Check that variable names match their definitions
-5. Restore from backup: `~/.config/oxwm/config.ron.backup.*`
+3. Verify color codes are valid (6 hex digits)
+4. Make sure you're returning the config table
+5. Restore from backup: `~/.config/oxwm/config.lua.backup.*`
+
+You can also test your Lua syntax directly:
+
+```bash
+lua -c ~/.config/oxwm/config.lua
+```
 
 Common mistakes:
 
 - Missing commas between fields
-- Mismatched brackets `()`, `[]`
-- Undefined variables
-- Invalid key names
-- Incorrect enum values (e.g., `Mod5` instead of `Mod4`)
+- Using `:` instead of `=` for assignment
+- Forgetting the `return` statement
+- Missing quotes around string values
+- Mismatched brackets `{}`, `[]`, `()`

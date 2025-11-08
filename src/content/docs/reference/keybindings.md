@@ -145,7 +145,7 @@ Mod+A              Toggle gaps
 
 ## Customization
 
-All these keybindings can be customized in `~/.config/oxwm/config.ron`.
+All these keybindings can be customized in `~/.config/oxwm/config.lua`.
 
 See the [Keybindings Configuration](/configuration/keybindings/) guide for details on creating custom keybindings.
 
@@ -173,8 +173,8 @@ Some default keybindings require external programs:
 
 Replace st with your preferred terminal in the config:
 
-```ron
-terminal: "alacritty",  // or kitty, wezterm, etc.
+```lua
+terminal = "alacritty",  -- or kitty, wezterm, etc.
 ```
 
 ## Cheat Sheet

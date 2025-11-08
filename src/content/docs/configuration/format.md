@@ -1,188 +1,232 @@
 ---
 title: Config File Format
-description: Understanding RON configuration syntax
+description: Understanding Lua configuration syntax
 ---
 
-oxwm uses RON (Rusty Object Notation) for its configuration format. This page explains the syntax and structure.
+oxwm uses Lua for its configuration format. This page explains the syntax and structure.
 
-## What is RON?
+## What is Lua?
 
-RON is a simple, readable data format similar to JSON but with Rust-like syntax. It's more human-friendly than JSON with features like:
+Lua is a lightweight, embeddable scripting language that's perfect for configuration. It's highly readable and flexible with features like:
 
-- Trailing commas allowed
-- Comments with `//`
-- Struct-like syntax with field names
-- Type-safe values
+- Simple table-based syntax
+- Comments with `--`
+- Variables and functions for modularization
+- Support for `require()` to split configs into modules
 
 ## Basic Syntax
 
 ### Structure
 
-The entire config is a single struct (tuple struct in RON terminology):
+The entire config is a Lua table that you return from the config file:
 
-```ron
-(
-    field1: value1,
-    field2: value2,
-    field3: value3,
-)
+```lua
+return {
+    field1 = value1,
+    field2 = value2,
+    field3 = value3,
+}
 ```
 
 ### Data Types
 
 **Integers:**
-```ron
-border_width: 2,
+```lua
+border_width = 2,
 ```
 
 **Hexadecimal (for colors):**
-```ron
-border_focused: 0x6dade3,
+```lua
+border_focused = 0x6dade3,  -- or "#6dade3" (both work)
 ```
 
 **Strings:**
-```ron
-terminal: "alacritty",
-font: "JetBrains Mono:style=Bold:size=11",
+```lua
+terminal = "alacritty",
+font = "JetBrains Mono:style=Bold:size=11",
 ```
 
 **Booleans:**
-```ron
-gaps_enabled: true,
+```lua
+gaps_enabled = true,
 ```
 
-**Enums (variants):**
-```ron
-modkey: Mod4,
+**String values (for modkeys, actions):**
+```lua
+modkey = "Mod4",
 ```
 
-**Lists:**
-```ron
-tags: ["1", "2", "3", "4", "5"],
+**Lists (tables):**
+```lua
+tags = { "1", "2", "3", "4", "5" },
 ```
 
-**Nested Structs:**
-```ron
-scheme_normal: (
-    foreground: 0xbbbbbb,
-    background: 0x1a1b26,
-    underline: 0x444444
-),
+**Nested Tables:**
+```lua
+scheme_normal = {
+    foreground = "#bbbbbb",
+    background = "#1a1b26",
+    underline = "#444444"
+},
 ```
 
-## Preprocessor Directives
+## Variables and Modularization
 
-oxwm adds a custom preprocessor on top of RON for variable substitution.
+Lua's native variable system makes configs clean and maintainable.
 
 ### Variable Definition
 
-Define variables at the top of your config:
+Define variables at the top of your config using `local`:
 
-```ron
-#DEFINE $terminal = "alacritty"
-#DEFINE $mod = Mod4
-#DEFINE $blue = 0x6dade3
-#DEFINE $gray = 0xbbbbbb
+```lua
+local terminal = "alacritty"
+local modkey = "Mod4"
+local blue = "#6dade3"
+local gray = "#bbbbbb"
 ```
 
 ### Variable Usage
 
 Use variables anywhere in your config:
 
-```ron
-(
-    terminal: $terminal,
-    modkey: $mod,
-    border_focused: $blue,
-    border_unfocused: $gray,
+```lua
+return {
+    terminal = terminal,
+    modkey = modkey,
+    border_focused = blue,
+    border_unfocused = gray,
 
-    keybindings: [
-        (modifiers: [$mod], key: Return, action: Spawn, arg: $terminal),
-        (modifiers: [$mod, Shift], key: Q, action: Quit),
-    ],
-)
+    keybindings = {
+        { modifiers = { modkey }, key = "Return", action = "Spawn", arg = terminal },
+        { modifiers = { modkey, "Shift" }, key = "Q", action = "Quit" },
+    },
+}
 ```
 
-### Variable Naming Rules
+### Color Palettes
 
-- Must start with `$`
-- Can contain letters, numbers, and underscores
-- Case-sensitive
-- Must be defined before use
+Create organized color schemes with tables:
+
+```lua
+local colors = {
+    fg = "#bbbbbb",
+    bg = "#1a1b26",
+    blue = "#6dade3",
+    red = "#f7768e",
+    cyan = "#0db9d7",
+}
+
+return {
+    border_focused = colors.blue,
+    scheme_normal = {
+        foreground = colors.fg,
+        background = colors.bg,
+    },
+}
+```
+
+### Modular Configs with `require()`
+
+Split your config into multiple files:
+
+```lua
+-- ~/.config/oxwm/keybindings.lua
+return {
+    { modifiers = { "Mod4" }, key = "Return", action = "Spawn", arg = "st" },
+    { modifiers = { "Mod4" }, key = "Q", action = "KillClient" },
+}
+
+-- ~/.config/oxwm/config.lua
+local keybindings = require("keybindings")
+
+return {
+    modkey = "Mod4",
+    keybindings = keybindings,
+}
+```
 
 ## Complete Example
 
 Here's a minimal but complete configuration:
 
-```ron
-#DEFINE $terminal = "st"
-#DEFINE $mod = Mod4
+```lua
+local terminal = "st"
+local modkey = "Mod4"
 
-(
-    // Appearance
-    border_width: 2,
-    border_focused: 0x6dade3,
-    border_unfocused: 0xbbbbbb,
-    font: "monospace:style=Bold:size=10",
+-- Color palette
+local colors = {
+    fg = "#bbbbbb",
+    bg = "#1a1b26",
+    blue = "#6dade3",
+    cyan = "#0db9d7",
+    purple = "#ad8ee6",
+}
 
-    // Gaps
-    gaps_enabled: true,
-    gap_inner_horizontal: 5,
-    gap_inner_vertical: 5,
-    gap_outer_horizontal: 5,
-    gap_outer_vertical: 5,
+return {
+    -- Appearance
+    border_width = 2,
+    border_focused = colors.blue,
+    border_unfocused = colors.fg,
+    font = "monospace:style=Bold:size=10",
 
-    // Basics
-    terminal: $terminal,
-    modkey: $mod,
+    -- Gaps
+    gaps_enabled = true,
+    gap_inner_horizontal = 5,
+    gap_inner_vertical = 5,
+    gap_outer_horizontal = 5,
+    gap_outer_vertical = 5,
 
-    // Tags
-    tags: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    -- Basics
+    terminal = terminal,
+    modkey = modkey,
 
-    // Layouts
-    layout_symbols: [
-        (name: "tiling", symbol: "[T]"),
-        (name: "normie", symbol: "[F]"),
-    ],
+    -- Tags
+    tags = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
 
-    // Keybindings
-    keybindings: [
-        (modifiers: [$mod], key: Return, action: Spawn, arg: $terminal),
-        (modifiers: [$mod], key: D, action: Spawn, arg: "dmenu_run"),
-        (modifiers: [$mod], key: Q, action: Kill),
-        (modifiers: [$mod, Shift], key: Q, action: Quit),
-        (modifiers: [$mod, Shift], key: R, action: Reload),
-    ],
+    -- Layouts
+    layout_symbols = {
+        { name = "tiling", symbol = "[T]" },
+        { name = "normie", symbol = "[F]" },
+    },
 
-    // Status bar
-    status_blocks: [
-        (
-            format: "{}",
-            command: "DateTime",
-            command_arg: "%H:%M",
-            interval_secs: 60,
-            color: 0x0db9d7,
-            underline: true
-        ),
-    ],
+    -- Keybindings
+    keybindings = {
+        { modifiers = { modkey }, key = "Return", action = "Spawn", arg = terminal },
+        { modifiers = { modkey }, key = "D", action = "Spawn", arg = "dmenu_run" },
+        { modifiers = { modkey }, key = "Q", action = "KillClient" },
+        { modifiers = { modkey, "Shift" }, key = "Q", action = "Quit" },
+        { modifiers = { modkey, "Shift" }, key = "R", action = "Restart" },
+    },
 
-    // Color schemes
-    scheme_normal: (
-        foreground: 0xbbbbbb,
-        background: 0x1a1b26,
-        underline: 0x444444
-    ),
-    scheme_occupied: (
-        foreground: 0x0db9d7,
-        background: 0x1a1b26,
-        underline: 0x0db9d7
-    ),
-    scheme_selected: (
-        foreground: 0x0db9d7,
-        background: 0x1a1b26,
-        underline: 0xad8ee6
-    ),
-)
+    -- Status bar
+    status_blocks = {
+        {
+            format = "{}",
+            command = "DateTime",
+            command_arg = "%H:%M",
+            interval_secs = 60,
+            color = colors.cyan,
+            underline = true
+        },
+    },
+
+    -- Color schemes
+    scheme_normal = {
+        foreground = colors.fg,
+        background = colors.bg,
+        underline = "#444444"
+    },
+    scheme_occupied = {
+        foreground = colors.cyan,
+        background = colors.bg,
+        underline = colors.cyan
+    },
+    scheme_selected = {
+        foreground = colors.cyan,
+        background = colors.bg,
+        underline = colors.purple
+    },
+}
 ```
 
 ## Keybinding Formats
@@ -193,24 +237,24 @@ oxwm supports two keybinding formats:
 
 For simple single-key bindings:
 
-```ron
-(modifiers: [Mod4], key: Return, action: Spawn, arg: "st"),
-(modifiers: [Mod4, Shift], key: Q, action: Quit),
+```lua
+{ modifiers = { "Mod4" }, key = "Return", action = "Spawn", arg = "st" },
+{ modifiers = { "Mod4", "Shift" }, key = "Q", action = "Quit" },
 ```
 
 ### Keychord Format
 
 For multi-key sequences (like vim or emacs):
 
-```ron
-(
-    keys: [
-        (modifiers: [Mod4], key: Space),  // First press: Mod4+Space
-        (modifiers: [], key: T),           // Then press: T
-    ],
-    action: Spawn,
-    arg: "st"
-),
+```lua
+{
+    keys = {
+        { modifiers = { "Mod4" }, key = "Space" },  -- First press: Mod4+Space
+        { modifiers = { }, key = "T" },             -- Then press: T
+    },
+    action = "Spawn",
+    arg = "st"
+},
 ```
 
 Press `Escape` to cancel a keychord sequence.
@@ -219,99 +263,126 @@ Press `Escape` to cancel a keychord sequence.
 
 Status blocks have a specific structure:
 
-```ron
-(
-    format: "RAM: {used}/{total} GB",  // Format string with placeholders
-    command: "Ram",                     // Command type
-    command_arg: "",                    // Optional argument (for Shell/DateTime)
-    interval_secs: 5,                   // Update interval
-    color: 0x7aa2f7,                   // Text color
-    underline: true                     // Show underline
-),
+```lua
+{
+    format = "RAM: {used}/{total} GB",  -- Format string with placeholders
+    command = "Ram",                     -- Command type
+    command_arg = "",                    -- Optional argument (for Shell/DateTime)
+    interval_secs = 5,                   -- Update interval
+    color = "#7aa2f7",                   -- Text color
+    underline = true                     -- Show underline
+},
 ```
 
 For battery blocks, use `battery_formats`:
 
-```ron
-(
-    format: "",
-    command: "Battery",
-    battery_formats: (
-        charging: "󰂄 {}%",
-        discharging: "󰁹 {}%",
-        full: "󰁹 {}%",
-    ),
-    interval_secs: 30,
-    color: 0x9ece6a,
-    underline: true
-),
+```lua
+{
+    format = "",
+    command = "Battery",
+    battery_formats = {
+        charging = "󰂄 {}%",
+        discharging = "󰁹 {}%",
+        full = "󰁹 {}%",
+    },
+    interval_secs = 30,
+    color = "#9ece6a",
+    underline = true
+},
 ```
 
 ## Common Mistakes
 
 ### Missing Commas
 
-```ron
-// ❌ Wrong - missing comma
-(
-    border_width: 2
-    border_focused: 0x6dade3
-)
+```lua
+-- ❌ Wrong - missing comma
+return {
+    border_width = 2
+    border_focused = "#6dade3"
+}
 
-// ✅ Correct
-(
-    border_width: 2,
-    border_focused: 0x6dade3,
-)
+-- ✅ Correct
+return {
+    border_width = 2,
+    border_focused = "#6dade3",
+}
 ```
 
-### Wrong Bracket Types
+### Wrong Assignment Operator
 
-```ron
-// ❌ Wrong - using curly braces
-{
+```lua
+-- ❌ Wrong - using colon
+return {
     terminal: "st",
 }
 
-// ✅ Correct - using parentheses
-(
-    terminal: "st",
-)
+-- ✅ Correct - using equals
+return {
+    terminal = "st",
+}
 ```
 
-### Invalid Hex Colors
+### Invalid Color Format
 
-```ron
-// ❌ Wrong - too few digits
-border_focused: 0x6dae,
+```lua
+-- ❌ Wrong - missing quotes for hex string
+border_focused = #6dade3,
 
-// ✅ Correct - exactly 6 hex digits
-border_focused: 0x6dade3,
+-- ✅ Correct - quotes or 0x prefix
+border_focused = "#6dade3",  -- or 0x6dade3
 ```
 
-### Undefined Variables
+### Using Global Variables
 
-```ron
-// ❌ Wrong - variable not defined
-(
-    terminal: $my_terminal,
-)
+```lua
+-- ❌ Wrong - no local keyword
+terminal = "st"
 
-// ✅ Correct - define before use
-#DEFINE $my_terminal = "st"
+return {
+    terminal = terminal,
+}
 
-(
-    terminal: $my_terminal,
-)
+-- ✅ Correct - use local
+local terminal = "st"
+
+return {
+    terminal = terminal,
+}
+```
+
+### Forgetting to Return
+
+```lua
+-- ❌ Wrong - no return statement
+{
+    terminal = "st",
+}
+
+-- ✅ Correct - must return the table
+return {
+    terminal = "st",
+}
 ```
 
 ## Tips
 
 1. **Use trailing commas** - Makes adding/removing fields easier
-2. **Define color variables** - Maintain consistent color scheme
-3. **Comment liberally** - Document your customizations
-4. **Test incrementally** - Make small changes and reload frequently with `Mod+Shift+R`
-5. **Keep a backup** - oxwm creates backups, but make your own too
+2. **Use local variables** - Define color palettes and reuse them
+3. **Comment liberally** - Use `--` to document your customizations
+4. **Split large configs** - Use `require()` to modularize
+5. **Test incrementally** - Make small changes and reload frequently with `Mod+Shift+R`
+6. **Keep a backup** - oxwm creates backups, but make your own too
+
+## Migrating from RON
+
+If you have an old RON config, use the migration tool:
+
+```bash
+oxwm --migrate
+```
+
+This will automatically convert your `config.ron` to `config.lua`, preserving all settings and creating a backup of your old config.
 
 ## Validation Tools
 
@@ -319,7 +390,10 @@ Check your config syntax:
 
 ```bash
 # Try to start oxwm with your config (will show errors if invalid)
-oxwm --config ~/.config/oxwm/config.ron
+oxwm --config ~/.config/oxwm/config.lua
+
+# Or test Lua syntax directly
+lua -c ~/.config/oxwm/config.lua
 ```
 
 If there are syntax errors, oxwm will print the error and line number.

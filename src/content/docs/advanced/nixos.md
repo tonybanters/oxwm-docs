@@ -143,8 +143,8 @@ Manage your oxwm config declaratively:
 
 {
   home-manager.users.username = {
-    xdg.configFile."oxwm/config.ron" = {
-      source = ./oxwm-config.ron;
+    xdg.configFile."oxwm/config.lua" = {
+      source = ./oxwm-config.lua;
     };
   };
 }
@@ -168,15 +168,15 @@ Generate config from Nix:
 
 {
   home-manager.users.username = {
-    xdg.configFile."oxwm/config.ron".text = ''
-      (
-        border_width: 2,
-        border_focused: 0x6dade3,
-        border_unfocused: 0xbbbbbb,
-        terminal: "${pkgs.alacritty}/bin/alacritty",
-        modkey: Mod4,
-        // ... rest of config
-      )
+    xdg.configFile."oxwm/config.lua".text = ''
+      return {
+        border_width = 2,
+        border_focused = "#6dade3",
+        border_unfocused = "#bbbbbb",
+        terminal = "${pkgs.alacritty}/bin/alacritty",
+        modkey = "Mod4",
+        -- ... rest of config
+      }
     '';
   };
 }
@@ -193,22 +193,22 @@ let
   terminal = "${pkgs.alacritty}/bin/alacritty";
   browser = "${pkgs.firefox}/bin/firefox";
   colors = {
-    blue = "0x6dade3";
-    gray = "0xbbbbbb";
+    blue = "#6dade3";
+    gray = "#bbbbbb";
   };
 in {
   home-manager.users.username = {
-    xdg.configFile."oxwm/config.ron".text = ''
-      (
-        terminal: "${terminal}",
-        border_focused: ${colors.blue},
-        border_unfocused: ${colors.gray},
-        keybindings: [
-          (modifiers: [Mod4], key: Return, action: Spawn, arg: "${terminal}"),
-          (modifiers: [Mod4], key: B, action: Spawn, arg: "${browser}"),
-        ],
-        // ... rest of config
-      )
+    xdg.configFile."oxwm/config.lua".text = ''
+      return {
+        terminal = "${terminal}",
+        border_focused = "${colors.blue}",
+        border_unfocused = "${colors.gray}",
+        keybindings = {
+          { modifiers = { "Mod4" }, key = "Return", action = "Spawn", arg = "${terminal}" },
+          { modifiers = { "Mod4" }, key = "B", action = "Spawn", arg = "${browser}" },
+        },
+        -- ... rest of config
+      }
     '';
   };
 }

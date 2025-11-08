@@ -100,30 +100,30 @@ Here are the most important keybindings to get started (assuming default `Mod4`/
 
 ## Customizing Your Setup
 
-The configuration file is located at `~/.config/oxwm/config.ron`.
+The configuration file is located at `~/.config/oxwm/config.lua`.
 
 ### Change Your Terminal
 
 Edit the `terminal` field:
 
-```ron
-terminal: "alacritty",  // or "kitty", "wezterm", etc.
+```lua
+terminal = "alacritty",  -- or "kitty", "wezterm", etc.
 ```
 
 ### Change Border Colors
 
-```ron
-border_focused: 0x6dade3,    // Blue when focused
-border_unfocused: 0xbbbbbb,  // Gray when unfocused
+```lua
+border_focused = "#6dade3",    -- Blue when focused
+border_unfocused = "#bbbbbb",  -- Gray when unfocused
 ```
 
 ### Adjust Gaps
 
-```ron
-gap_inner_horizontal: 5,
-gap_inner_vertical: 5,
-gap_outer_horizontal: 5,
-gap_outer_vertical: 5,
+```lua
+gap_inner_horizontal = 5,
+gap_inner_vertical = 5,
+gap_outer_horizontal = 5,
+gap_outer_vertical = 5,
 ```
 
 ### Reload Configuration
@@ -141,6 +141,8 @@ After making changes, press `Mod+Shift+R` to reload the config without restartin
 
 If you encounter issues:
 
-1. Check that your config file syntax is valid (RON format)
-2. Look at the default config: `oxwm --init` (backs up existing config)
-3. Visit the [GitHub repository](https://github.com/tonybanters/oxwm) to report bugs
+1. Check that your config file syntax is valid (Lua format)
+2. Test your config syntax: `lua -c ~/.config/oxwm/config.lua`
+3. Look at the default config: `oxwm --init` (backs up existing config)
+4. If migrating from RON: `oxwm --migrate` to convert automatically
+5. Visit the [GitHub repository](https://github.com/tonybanters/oxwm) to report bugs

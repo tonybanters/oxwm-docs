@@ -104,12 +104,18 @@ startx
 
 ## First Run
 
-On first run, oxwm will automatically generate a default configuration file at `~/.config/oxwm/config.ron`.
+On first run, oxwm will automatically generate a default configuration file at `~/.config/oxwm/config.lua`.
 
 You can also manually generate the config with:
 
 ```bash
 oxwm --init
+```
+
+If you have an existing RON configuration from an older version, migrate it with:
+
+```bash
+oxwm --migrate
 ```
 
 After installation, proceed to the [Quick Start](/getting-started/quick-start/) guide to learn the basics.

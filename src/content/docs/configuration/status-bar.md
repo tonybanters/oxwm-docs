@@ -14,19 +14,19 @@ The status bar displays:
 
 ## Status Block Configuration
 
-Status blocks are defined in the `status_blocks` array:
+Status blocks are defined in the `status_blocks` table:
 
-```ron
-status_blocks: [
-    (
-        format: "{}",
-        command: "DateTime",
-        command_arg: "%H:%M",
-        interval_secs: 60,
-        color: 0x0db9d7,
-        underline: true
-    ),
-],
+```lua
+status_blocks = {
+    {
+        format = "{}",
+        command = "DateTime",
+        command_arg = "%H:%M",
+        interval_secs = 60,
+        color = "#0db9d7",
+        underline = true
+    },
+},
 ```
 
 ### Block Fields
@@ -46,33 +46,33 @@ status_blocks: [
 
 Display date and time using strftime format:
 
-```ron
-(
-    format: "{}",
-    command: "DateTime",
-    command_arg: "%a, %b %d - %-I:%M %P",  // Mon, Jan 01 - 3:45 pm
-    interval_secs: 1,  // Update every second
-    color: 0x0db9d7,
-    underline: true
-),
+```lua
+{
+    format = "{}",
+    command = "DateTime",
+    command_arg = "%a, %b %d - %-I:%M %P",  -- Mon, Jan 01 - 3:45 pm
+    interval_secs = 1,  -- Update every second
+    color = "#0db9d7",
+    underline = true
+},
 ```
 
 **Common date/time formats:**
 
-```ron
-// Time only
-"%H:%M"           // 15:30 (24-hour)
-"%-I:%M %P"       // 3:30 pm (12-hour)
-"%H:%M:%S"        // 15:30:45 (with seconds)
+```lua
+-- Time only
+"%H:%M"           -- 15:30 (24-hour)
+"%-I:%M %P"       -- 3:30 pm (12-hour)
+"%H:%M:%S"        -- 15:30:45 (with seconds)
 
-// Date only
-"%Y-%m-%d"        // 2025-01-15
-"%a, %b %d"       // Mon, Jan 15
-"%B %d, %Y"       // January 15, 2025
+-- Date only
+"%Y-%m-%d"        -- 2025-01-15
+"%a, %b %d"       -- Mon, Jan 15
+"%B %d, %Y"       -- January 15, 2025
 
-// Date and time
-"%a %b %d - %-I:%M %P"     // Mon Jan 15 - 3:30 pm
-"%Y-%m-%d %H:%M"           // 2025-01-15 15:30
+-- Date and time
+"%a %b %d - %-I:%M %P"     -- Mon Jan 15 - 3:30 pm
+"%Y-%m-%d %H:%M"           -- 2025-01-15 15:30
 ```
 
 For complete strftime format reference, see `man strftime`.
@@ -81,15 +81,15 @@ For complete strftime format reference, see `man strftime`.
 
 Display RAM usage:
 
-```ron
-(
-    format: "RAM: {used}/{total} GB",
-    command: "Ram",
-    command_arg: "",  // Not used
-    interval_secs: 5,
-    color: 0x7aa2f7,
-    underline: true
-),
+```lua
+{
+    format = "RAM: {used}/{total} GB",
+    command = "Ram",
+    command_arg = "",  -- Not used
+    interval_secs = 5,
+    color = "#7aa2f7",
+    underline = true
+},
 ```
 
 **Available placeholders:**
@@ -98,29 +98,29 @@ Display RAM usage:
 
 **Format examples:**
 
-```ron
-format: "{used}/{total} GB"      // 8/16 GB
-format: "RAM: {used}G"           // RAM: 8G
-format: "󰍛 {used}/{total}"        // With icon
+```lua
+format = "{used}/{total} GB"      -- 8/16 GB
+format = "RAM: {used}G"           -- RAM: 8G
+format = "󰍛 {used}/{total}"        -- With icon
 ```
 
 ### Battery
 
 Display battery status with different formats for each state:
 
-```ron
-(
-    format: "",  // Not used with battery_formats
-    command: "Battery",
-    battery_formats: (
-        charging: "󰂄 {}%",
-        discharging: "󰁹 {}%",
-        full: "󰁹 {}%",
-    ),
-    interval_secs: 30,
-    color: 0x9ece6a,
-    underline: true
-),
+```lua
+{
+    format = "",  -- Not used with battery_formats
+    command = "Battery",
+    battery_formats = {
+        charging = "󰂄 {}%",
+        discharging = "󰁹 {}%",
+        full = "󰁹 {}%",
+    },
+    interval_secs = 30,
+    color = "#9ece6a",
+    underline = true
+},
 ```
 
 **Battery format fields:**
@@ -132,157 +132,157 @@ The `{}` placeholder is replaced with battery percentage.
 
 **Format examples:**
 
-```ron
-// With icons
-battery_formats: (
-    charging: "󰂄 {}%",     // Charging icon
-    discharging: "󰁹 {}%",  // Battery icon
-    full: "󰂅 {}%",         // Full battery icon
-),
+```lua
+-- With icons
+battery_formats = {
+    charging = "󰂄 {}%",     -- Charging icon
+    discharging = "󰁹 {}%",  -- Battery icon
+    full = "󰂅 {}%",         -- Full battery icon
+},
 
-// Simple text
-battery_formats: (
-    charging: "CHG {}%",
-    discharging: "BAT {}%",
-    full: "FULL {}%",
-),
+-- Simple text
+battery_formats = {
+    charging = "CHG {}%",
+    discharging = "BAT {}%",
+    full = "FULL {}%",
+},
 
-// Minimal
-battery_formats: (
-    charging: "+{}%",
-    discharging: "{}%",
-    full: "{}%",
-),
+-- Minimal
+battery_formats = {
+    charging = "+{}%",
+    discharging = "{}%",
+    full = "{}%",
+},
 ```
 
 ### Shell
 
 Execute a shell command and display its output:
 
-```ron
-(
-    format: "{}",
-    command: "Shell",
-    command_arg: "uname -r",  // Shell command to execute
-    interval_secs: 3600,      // Update every hour
-    color: 0xf7768e,
-    underline: true
-),
+```lua
+{
+    format = "{}",
+    command = "Shell",
+    command_arg = "uname -r",  -- Shell command to execute
+    interval_secs = 3600,      -- Update every hour
+    color = "#f7768e",
+    underline = true
+},
 ```
 
 **Examples:**
 
-```ron
-// Display kernel version
-(format: " {}", command: "Shell", command_arg: "uname -r",
- interval_secs: 18446744073709551615, color: 0xf7768e, underline: true),
+```lua
+-- Display kernel version
+{ format = " {}", command = "Shell", command_arg = "uname -r",
+  interval_secs = 18446744073709551615, color = "#f7768e", underline = true },
 
-// Display uptime
-(format: "UP: {}", command: "Shell",
- command_arg: "uptime -p | sed 's/up //'",
- interval_secs: 300, color: 0x7dcfff, underline: true),
+-- Display uptime
+{ format = "UP: {}", command = "Shell",
+  command_arg = "uptime -p | sed 's/up //'",
+  interval_secs = 300, color = "#7dcfff", underline = true },
 
-// Display CPU temperature
-(format: "{}°C", command: "Shell",
- command_arg: "cat /sys/class/thermal/thermal_zone0/temp | awk '{print $1/1000}'",
- interval_secs: 5, color: 0xf7768e, underline: true),
+-- Display CPU temperature
+{ format = "{}°C", command = "Shell",
+  command_arg = "cat /sys/class/thermal/thermal_zone0/temp | awk '{print int($1/1000)}'",
+  interval_secs = 5, color = "#f7768e", underline = true },
 
-// Display volume
-(format: "VOL: {}", command: "Shell",
- command_arg: "amixer get Master | grep -o '[0-9]*%' | head -1",
- interval_secs: 1, color: 0x9ece6a, underline: true),
+-- Display volume
+{ format = "VOL: {}", command = "Shell",
+  command_arg = "amixer get Master | grep -o '[0-9]*%' | head -1",
+  interval_secs = 1, color = "#9ece6a", underline = true },
 ```
 
 **Note:** Keep shell commands lightweight to avoid performance issues.
 
-### Static (Future)
+### Static
 
-Display static text (planned feature, currently use Shell with `echo`):
+Display static text:
 
-```ron
-(format: "{}", command: "Shell", command_arg: "echo 'oxwm'",
- interval_secs: 18446744073709551615, color: 0xbb9af7, underline: true),
+```lua
+{ format = "oxwm", command = "Static",
+  interval_secs = 999999999, color = "#bb9af7", underline = true },
 ```
 
 ## Complete Status Bar Examples
 
 ### Minimal
 
-```ron
-status_blocks: [
-    (format: "{}", command: "DateTime", command_arg: "%H:%M",
-     interval_secs: 60, color: 0x0db9d7, underline: true),
-],
+```lua
+status_blocks = {
+    { format = "{}", command = "DateTime", command_arg = "%H:%M",
+      interval_secs = 60, color = "#0db9d7", underline = true },
+}
 ```
 
 ### Standard
 
-```ron
-status_blocks: [
-    (format: "RAM: {used}/{total} GB", command: "Ram", command_arg: "",
-     interval_secs: 5, color: 0x7aa2f7, underline: true),
+```lua
+status_blocks = {
+    { format = "RAM: {used}/{total} GB", command = "Ram", command_arg = "",
+      interval_secs = 5, color = "#7aa2f7", underline = true },
 
-    (format: "{}", command: "DateTime", command_arg: "%a, %b %d - %-I:%M %P",
-     interval_secs: 1, color: 0x0db9d7, underline: true),
-],
+    { format = "{}", command = "DateTime", command_arg = "%a, %b %d - %-I:%M %P",
+      interval_secs = 1, color = "#0db9d7", underline = true },
+}
 ```
 
 ### Laptop Setup
 
-```ron
-status_blocks: [
-    (format: "", command: "Battery",
-     battery_formats: (
-         charging: "󰂄 {}%",
-         discharging: "󰁹 {}%",
-         full: "󰁹 {}%",
-     ),
-     interval_secs: 30, color: 0x9ece6a, underline: true),
+```lua
+status_blocks = {
+    { format = "", command = "Battery",
+      battery_formats = {
+          charging = "󰂄 {}%",
+          discharging = "󰁹 {}%",
+          full = "󰁹 {}%",
+      },
+      interval_secs = 30, color = "#9ece6a", underline = true },
 
-    (format: "󰍛 {used}/{total}", command: "Ram", command_arg: "",
-     interval_secs: 5, color: 0x7aa2f7, underline: true),
+    { format = "󰍛 {used}/{total}", command = "Ram", command_arg = "",
+      interval_secs = 5, color = "#7aa2f7", underline = true },
 
-    (format: "󰸘 {}", command: "DateTime", command_arg: "%a, %b %d - %-I:%M %P",
-     interval_secs: 1, color: 0x0db9d7, underline: true),
-],
+    { format = "󰸘 {}", command = "DateTime", command_arg = "%a, %b %d - %-I:%M %P",
+      interval_secs = 1, color = "#0db9d7", underline = true },
+}
 ```
 
 ### Advanced
 
-```ron
-status_blocks: [
-    // System info
-    (format: " {}", command: "Shell", command_arg: "uname -r",
-     interval_secs: 18446744073709551615, color: 0xf7768e, underline: true),
+```lua
+status_blocks = {
+    -- System info
+    { format = " {}", command = "Shell", command_arg = "uname -r",
+      interval_secs = 18446744073709551615, color = "#f7768e", underline = true },
 
-    // Volume
-    (format: "VOL: {}", command: "Shell",
-     command_arg: "amixer get Master | grep -o '[0-9]*%' | head -1",
-     interval_secs: 1, color: 0x9ece6a, underline: true),
+    -- Volume
+    { format = "VOL: {}", command = "Shell",
+      command_arg = "amixer get Master | grep -o '[0-9]*%' | head -1",
+      interval_secs = 1, color = "#9ece6a", underline = true },
 
-    // CPU temp
-    (format: "{}°C", command: "Shell",
-     command_arg: "cat /sys/class/thermal/thermal_zone0/temp | awk '{print int($1/1000)}'",
-     interval_secs: 5, color: 0xff9e64, underline: true),
+    -- CPU temp
+    { format = "{}°C", command = "Shell",
+      command_arg = "cat /sys/class/thermal/thermal_zone0/temp | awk '{print int($1/1000)}'",
+      interval_secs = 5, color = "#ff9e64", underline = true },
 
-    // RAM
-    (format: "󰍛 {used}/{total}", command: "Ram", command_arg: "",
-     interval_secs: 5, color: 0x7aa2f7, underline: true),
+    -- RAM
+    { format = "󰍛 {used}/{total}", command = "Ram", command_arg = "",
+      interval_secs = 5, color = "#7aa2f7", underline = true },
 
-    // Battery
-    (format: "", command: "Battery",
-     battery_formats: (
-         charging: "󰂄 {}%",
-         discharging: "󰁹 {}%",
-         full: "󰁹 {}%",
-     ),
-     interval_secs: 30, color: 0x9ece6a, underline: true),
+    -- Battery
+    { format = "", command = "Battery",
+      battery_formats = {
+          charging = "󰂄 {}%",
+          discharging = "󰁹 {}%",
+          full = "󰁹 {}%",
+      },
+      interval_secs = 30, color = "#9ece6a", underline = true },
 
-    // Date and time
-    (format: "󰸘 {}", command: "DateTime",
-     command_arg: "%a, %b %d - %-I:%M %P",
-     interval_secs: 1, color: 0x0db9d7, underline: true),
-],
+    -- Date and time
+    { format = "󰸘 {}", command = "DateTime",
+      command_arg = "%a, %b %d - %-I:%M %P",
+      interval_secs = 1, color = "#0db9d7", underline = true },
+}
 ```
 
 ## Update Intervals
@@ -299,20 +299,22 @@ Choose appropriate intervals for each block:
 
 ## Using Variables
 
-```ron
-#DEFINE $blue = 0x7aa2f7
-#DEFINE $cyan = 0x0db9d7
-#DEFINE $green = 0x9ece6a
+```lua
+local colors = {
+    blue = "#7aa2f7",
+    cyan = "#0db9d7",
+    green = "#9ece6a",
+}
 
-(
-    status_blocks: [
-        (format: "RAM: {used}/{total} GB", command: "Ram", command_arg: "",
-         interval_secs: 5, color: $blue, underline: true),
+return {
+    status_blocks = {
+        { format = "RAM: {used}/{total} GB", command = "Ram", command_arg = "",
+          interval_secs = 5, color = colors.blue, underline = true },
 
-        (format: "󰸘 {}", command: "DateTime", command_arg: "%H:%M",
-         interval_secs: 60, color: $cyan, underline: true),
-    ],
-)
+        { format = "󰸘 {}", command = "DateTime", command_arg = "%H:%M",
+          interval_secs = 60, color = colors.cyan, underline = true },
+    },
+}
 ```
 
 ## Performance Tips
@@ -345,8 +347,8 @@ yay -S nerd-fonts-complete
 
 Update your font config:
 
-```ron
-font: "JetBrainsMono Nerd Font:style=Bold:size=11",
+```lua
+font = "JetBrainsMono Nerd Font:style=Bold:size=11",
 ```
 
 ### Shell block showing nothing
@@ -360,15 +362,15 @@ font: "JetBrainsMono Nerd Font:style=Bold:size=11",
 
 Match your blocks to your color scheme:
 
-```ron
-// Tokyo Night theme
-status_blocks: [
-    (color: 0x7aa2f7),  // Blue
-    (color: 0x9ece6a),  // Green
-    (color: 0x0db9d7),  // Cyan
-    (color: 0xbb9af7),  // Purple
-    (color: 0xf7768e),  // Red
-],
+```lua
+-- Tokyo Night theme
+status_blocks = {
+    { color = "#7aa2f7" },  -- Blue
+    { color = "#9ece6a" },  -- Green
+    { color = "#0db9d7" },  -- Cyan
+    { color = "#bb9af7" },  -- Purple
+    { color = "#f7768e" },  -- Red
+}
 ```
 
 For more details on status block commands, see the [Status Blocks Reference](/reference/status-blocks/).

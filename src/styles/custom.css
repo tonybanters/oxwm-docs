@@ -1,0 +1,303 @@
+/* Tokyo Night Color Scheme for oxwm docs */
+
+:root {
+  /* Tokyo Night color palette */
+  --tokyonight-bg: #1a1b26;
+  --tokyonight-fg: #c0caf5;
+  --tokyonight-blue: #7aa2f7;
+  --tokyonight-cyan: #0db9d7;
+  --tokyonight-green: #9ece6a;
+  --tokyonight-red: #f7768e;
+  --tokyonight-yellow: #e0af68;
+  --tokyonight-magenta: #ad8ee6;
+  --tokyonight-comment: #565f89;
+  --tokyonight-darker: #16161e;
+  --tokyonight-dark: #232635;
+  --tokyonight-lighter: #24283b;
+  --tokyonight-selection: #32344a;
+
+  /* Override Starlight's default colors */
+  --sl-color-white: #c0caf5;
+  --sl-color-gray-1: #a9b1d6;
+  --sl-color-gray-2: #565f89;
+  --sl-color-gray-3: #444b6a;
+  --sl-color-gray-4: #32344a;
+  --sl-color-gray-5: #24283b;
+  --sl-color-gray-6: #1a1b26;
+  --sl-color-black: #16161e;
+
+  /* Accent colors */
+  --sl-color-accent-low: #1f2335;
+  --sl-color-accent: #7aa2f7;
+  --sl-color-accent-high: #82aaff;
+
+  /* Text colors */
+  --sl-color-text: #c0caf5;
+  --sl-color-text-accent: #7aa2f7;
+
+  /* Background colors */
+  --sl-color-bg: #1a1b26;
+  --sl-color-bg-nav: #16161e;
+  --sl-color-bg-sidebar: #1a1b26;
+  --sl-color-bg-inline-code: #24283b;
+
+  /* Border colors */
+  --sl-color-hairline: #32344a;
+  --sl-color-hairline-light: #24283b;
+  --sl-color-hairline-shade: #444b6a;
+
+  /* Link colors */
+  --sl-color-text-invert: #1a1b26;
+
+  /* Code block colors */
+  --sl-color-code-bg: #232635;
+}
+
+/* Body background */
+body {
+  background-color: var(--tokyonight-bg);
+  color: var(--tokyonight-fg);
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--tokyonight-blue);
+}
+
+/* Links */
+a {
+  color: var(--tokyonight-blue);
+}
+
+a:hover {
+  color: #82aaff;
+}
+
+/* Code blocks */
+pre {
+  background-color: var(--tokyonight-dark) !important;
+  border: 1px solid var(--tokyonight-blue);
+}
+
+code {
+  background-color: var(--tokyonight-lighter);
+  color: var(--tokyonight-magenta);
+}
+
+/* Sidebar */
+.sidebar {
+  background-color: var(--tokyonight-bg);
+  border-right: 1px solid var(--tokyonight-selection);
+}
+
+/* Navigation */
+nav {
+  background-color: var(--tokyonight-bg);
+}
+
+/* Callouts/Asides */
+.starlight-aside {
+  border-color: var(--tokyonight-blue);
+  background-color: var(--tokyonight-dark);
+}
+
+.starlight-aside--note {
+  border-color: var(--tokyonight-blue);
+}
+
+.starlight-aside--tip {
+  border-color: var(--tokyonight-green);
+}
+
+.starlight-aside--caution {
+  border-color: var(--tokyonight-yellow);
+}
+
+.starlight-aside--danger {
+  border-color: var(--tokyonight-red);
+}
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  background-color: var(--tokyonight-bg);
+}
+
+th {
+  background-color: var(--tokyonight-bg);
+  color: var(--tokyonight-fg);
+  border-left: none;
+  border-right: none;
+  border-top: 1px solid var(--tokyonight-selection);
+  border-bottom: 1px solid var(--tokyonight-selection);
+}
+
+td {
+  background-color: var(--tokyonight-bg);
+  color: var(--tokyonight-fg);
+  border-left: none;
+  border-right: none;
+  border-top: 1px solid var(--tokyonight-selection);
+  border-bottom: 1px solid var(--tokyonight-selection);
+}
+
+/* Blockquotes */
+blockquote {
+  background-color: var(--tokyonight-dark);
+  border-left: 3px solid var(--tokyonight-blue);
+  color: var(--tokyonight-fg);
+}
+
+/* Search - fixed to have black background with white text */
+.search-input,
+site-search input[type="search"],
+starlight-search input,
+.pagefind-ui__search-input {
+  background-color: var(--tokyonight-darker) !important;
+  border: 1px solid var(--tokyonight-selection) !important;
+  color: var(--tokyonight-fg) !important;
+}
+
+/* Search placeholder text */
+site-search input::placeholder,
+starlight-search input::placeholder,
+.pagefind-ui__search-input::placeholder {
+  color: var(--tokyonight-fg) !important;
+  opacity: 0.7;
+}
+
+/* Search icons and kbd (Ctrl+K) */
+site-search svg,
+site-search kbd,
+.pagefind-ui__button svg {
+  color: var(--tokyonight-fg) !important;
+  fill: var(--tokyonight-fg) !important;
+}
+
+site-search kbd {
+  background-color: var(--tokyonight-selection) !important;
+  color: var(--tokyonight-fg) !important;
+  border-color: var(--tokyonight-comment) !important;
+}
+
+/* Search button specifically */
+site-search button,
+.pagefind-ui__search-clear {
+  background-color: var(--tokyonight-darker) !important;
+  color: var(--tokyonight-fg) !important;
+}
+
+/* Main container - use tokyonight-bg instead of tokyonight-dark */
+.sl-container {
+  background-color: var(--tokyonight-bg) !important;
+}
+
+/* Table of Contents (right sidebar) - match site background */
+.right-sidebar {
+  background-color: var(--tokyonight-bg) !important;
+}
+
+.right-sidebar-panel {
+  background-color: var(--tokyonight-bg) !important;
+}
+
+/* "On This Page" header - make it white like left sidebar headers */
+.right-sidebar h2,
+.right-sidebar-panel h2 {
+  color: var(--tokyonight-fg) !important;
+}
+
+/* Selected/Active sidebar link - black text on teal background */
+.sidebar a[aria-current="page"],
+.sidebar a[data-current-parent="true"] {
+  background-color: var(--tokyonight-cyan) !important;
+  color: var(--tokyonight-darker) !important;
+  font-weight: 600;
+}
+
+.sidebar a[aria-current="page"]:hover,
+.sidebar a[data-current-parent="true"]:hover {
+  background-color: var(--tokyonight-cyan) !important;
+  color: var(--tokyonight-darker) !important;
+}
+
+/* Buttons - default to page background */
+button, .sl-link-button {
+  background-color: var(--tokyonight-bg);
+  color: var(--tokyonight-blue);
+}
+
+button:hover, .sl-link-button:hover {
+  background-color: var(--tokyonight-bg);
+  color: var(--tokyonight-blue);
+}
+
+/* Hero/action buttons - primary stays blue */
+.action.primary {
+  background-color: var(--tokyonight-blue);
+  color: var(--tokyonight-bg);
+}
+
+.action.primary:hover {
+  background-color: var(--tokyonight-blue);
+  color: var(--tokyonight-bg);
+}
+
+/* Secondary action button (View on GitHub) - use page background color */
+.action.secondary,
+.action.minimal {
+  background-color: var(--tokyonight-bg);
+  color: var(--tokyonight-blue);
+  border: 1px solid var(--tokyonight-blue);
+}
+
+.action.secondary:hover,
+.action.minimal:hover {
+  background-color: var(--tokyonight-bg);
+  color: var(--tokyonight-blue);
+}
+
+/* Hero text should be white/light gray */
+.hero h1,
+.hero p,
+.hero .tagline,
+.sl-markdown-content > p {
+  color: var(--tokyonight-fg) !important;
+}
+
+/* Ensure card icons are visible */
+.card-grid .card svg,
+.card-grid .card .icon {
+  color: var(--tokyonight-blue);
+  fill: var(--tokyonight-blue);
+  opacity: 1;
+}
+
+/* Card styling */
+.card {
+  background-color: var(--tokyonight-dark);
+  border: 1px solid var(--tokyonight-selection);
+}
+
+.card .title {
+  color: var(--tokyonight-blue);
+}
+
+/* Scrollbar styling for webkit browsers */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--tokyonight-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tokyonight-selection);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tokyonight-comment);
+}

@@ -284,12 +284,12 @@ Exit oxwm (log out).
 
 Hot reload the configuration file.
 
-```ron
-(modifiers: [Mod4, Shift], key: R, action: Reload)
+```lua
+{ modifiers = { "Mod4", "Shift" }, key = "R", action = "Restart" }
 ```
 
 - **Requires arg:** No
-- **Description:** Reloads `~/.config/oxwm/config.ron` without restarting
+- **Description:** Reloads `~/.config/oxwm/config.lua` without restarting
 - **Notes:**
   - Window state is preserved
   - New keybindings take effect immediately
