@@ -1,0 +1,291 @@
+---
+title: Bar Configuration
+description: Customize OXWM's status bar
+sidebar:
+  order: 3
+---
+
+Configure OXWM's status bar appearance, font, blocks, and color schemes.
+
+## Bar Font
+
+**Set the font for the entire bar.**
+
+```lua
+oxwm.bar.set_font("monospace:style=Bold:size=10")
+```
+
+| Parameter | Type   | Description |
+|-----------|--------|-------------|
+| font      | string | Font specification in XFT format: `"family:style=Style:size=Size"` |
+
+**Examples:**
+```lua
+oxwm.bar.set_font("monospace:style=Bold:size=10")
+oxwm.bar.set_font("JetBrainsMono Nerd Font:style=Bold:size=12")
+oxwm.bar.set_font("Fira Code:style=Medium:size=11")
+```
+
+## Status Blocks
+
+**Add information blocks to display in the bar.**
+
+```lua
+oxwm.bar.add_block(format, command, arg, interval, color, underline)
+```
+
+| Parameter | Type           | Description |
+|-----------|----------------|-------------|
+| format    | string         | Display format with `{}` placeholders |
+| command   | string         | Block type: `"DateTime"`, `"Shell"`, `"Ram"`, `"Static"`, `"Battery"` |
+| arg       | string/table/nil | Command-specific argument (depends on block type) |
+| interval  | integer        | Update interval in seconds |
+| color     | string/integer | Text color (hex string like `"#0db9d7"` or integer like `0x0db9d7`) |
+| underline | boolean        | Show underline decoration |
+
+### DateTime Block
+
+**Display formatted date and time.**
+
+```lua
+oxwm.bar.add_block("{}", "DateTime", "%H:%M", 60, "#0db9d7", true)
+```
+
+| Parameter | Value |
+|-----------|-------|
+| format    | Any string with `{}` placeholder |
+| command   | `"DateTime"` |
+| arg       | strftime format string (e.g., `"%H:%M"`, `"%a, %b %d"`) |
+| interval  | Update frequency in seconds (1 for live clock, 60 for minute updates) |
+
+**Common format codes:**
+- `%H:%M` - 24-hour time (14:30)
+- `%-I:%M %P` - 12-hour time (2:30 pm)
+- `%a` - Weekday abbreviation (Mon)
+- `%b %d` - Month and day (Jan 15)
+- `%Y-%m-%d` - ISO date (2024-01-15)
+
+**Examples:**
+```lua
+-- Simple clock
+oxwm.bar.add_block("{}", "DateTime", "%H:%M", 60, "#0db9d7", true)
+
+-- Full date and time
+oxwm.bar.add_block("{}", "DateTime", "%a, %b %d - %-I:%M %P", 1, "#0db9d7", true)
+```
+
+### Shell Block
+
+**Execute shell commands and display output.**
+
+```lua
+oxwm.bar.add_block("Kernel: {}", "Shell", "uname -r", 999999999, "#f7768e", true)
+```
+
+| Parameter | Value |
+|-----------|-------|
+| format    | Any string with `{}` placeholder |
+| command   | `"Shell"` |
+| arg       | Shell command to execute |
+| interval  | Update frequency (use high value like `999999999` for static data) |
+
+**Examples:**
+```lua
+-- Kernel version (static)
+oxwm.bar.add_block("Kernel: {}", "Shell", "uname -r", 999999999, "#f7768e", true)
+
+-- Volume level (updates frequently)
+oxwm.bar.add_block("Vol: {}", "Shell", "pamixer --get-volume", 1, "#9ece6a", true)
+
+-- Custom script
+oxwm.bar.add_block("Updates: {}", "Shell", "checkupdates | wc -l", 3600, "#f7768e", true)
+```
+
+### Ram Block
+
+**Display memory usage.**
+
+```lua
+oxwm.bar.add_block("RAM: {used}/{total} GB", "Ram", nil, 5, "#7aa2f7", true)
+```
+
+| Parameter | Value |
+|-----------|-------|
+| format    | String with `{used}` and/or `{total}` placeholders |
+| command   | `"Ram"` |
+| arg       | Must be `nil` |
+| interval  | Update frequency in seconds (3-5 recommended) |
+
+**Available placeholders:**
+- `{used}` - RAM in use (GB)
+- `{total}` - Total system RAM (GB)
+
+**Examples:**
+```lua
+oxwm.bar.add_block("RAM: {used}/{total} GB", "Ram", nil, 5, "#7aa2f7", true)
+oxwm.bar.add_block("{used} GB", "Ram", nil, 3, "#7aa2f7", true)
+```
+
+### Static Block
+
+**Display unchanging text (separators, labels).**
+
+```lua
+oxwm.bar.add_block(" │ ", "Static", " │ ", 999999999, "#a9b1d6", false)
+```
+
+| Parameter | Value |
+|-----------|-------|
+| format    | Any string (typically matches arg) |
+| command   | `"Static"` |
+| arg       | Text to display |
+| interval  | Use very high value (e.g., `999999999`) |
+
+**Examples:**
+```lua
+-- Separator
+oxwm.bar.add_block(" │ ", "Static", " │ ", 999999999, "#a9b1d6", false)
+
+-- Icon separator
+oxwm.bar.add_block("  ", "Static", "  ", 999999999, "#a9b1d6", false)
+```
+
+### Battery Block
+
+**Display battery status with different formats for charging states.**
+
+```lua
+oxwm.bar.add_block("", "Battery", {
+    charging = "Bat: {}% (charging)",
+    discharging = "Bat: {}%",
+    full = "Bat: Full"
+}, 30, "#9ece6a", true)
+```
+
+| Parameter | Value |
+|-----------|-------|
+| format    | Any string (can be empty if using formats table) |
+| command   | `"Battery"` |
+| arg       | Table with `charging`, `discharging`, and `full` format strings |
+| interval  | Update frequency in seconds (30-60 recommended) |
+
+The `{}` placeholder in each format string is replaced with battery percentage.
+
+**Example:**
+```lua
+oxwm.bar.add_block("", "Battery", {
+    charging = " Bat: {}%",
+    discharging = " Bat: {}%",
+    full = " Bat: Full"
+}, 30, "#9ece6a", true)
+```
+
+## Complete Bar Example
+
+```lua
+local colors = {
+    cyan = "#0db9d7",
+    blue = "#7aa2f7",
+    red = "#f7768e",
+    green = "#9ece6a",
+    lavender = "#a9b1d6",
+}
+
+-- Set font
+oxwm.bar.set_font("JetBrainsMono Nerd Font:style=Bold:size=12")
+
+-- Battery
+oxwm.bar.add_block("", "Battery", {
+    charging = " {}%",
+    discharging = " {}%",
+    full = " Full"
+}, 30, colors.green, true)
+
+-- Separator
+oxwm.bar.add_block(" │ ", "Static", " │ ", 999999999, colors.lavender, false)
+
+-- RAM
+oxwm.bar.add_block(" {used}/{total} GB", "Ram", nil, 5, colors.blue, true)
+
+-- Separator
+oxwm.bar.add_block(" │ ", "Static", " │ ", 999999999, colors.lavender, false)
+
+-- Kernel
+oxwm.bar.add_block(" {}", "Shell", "uname -r", 999999999, colors.red, true)
+
+-- Separator
+oxwm.bar.add_block(" │ ", "Static", " │ ", 999999999, colors.lavender, false)
+
+-- Date/time
+oxwm.bar.add_block(" {}", "DateTime", "%a, %b %d - %-I:%M %P", 1, colors.cyan, true)
+```
+
+## Tag Color Schemes
+
+**Configure how tags appear in the bar based on their state.**
+
+### Normal Scheme
+**Tags that are unselected and have no windows.**
+
+```lua
+oxwm.bar.set_scheme_normal(foreground, background, underline)
+```
+
+| Parameter  | Type           | Description |
+|------------|----------------|-------------|
+| foreground | string/integer | Text color |
+| background | string/integer | Background color |
+| underline  | string/integer | Underline color |
+
+### Occupied Scheme
+**Tags that have windows but are not currently selected.**
+
+```lua
+oxwm.bar.set_scheme_occupied(foreground, background, underline)
+```
+
+| Parameter  | Type           | Description |
+|------------|----------------|-------------|
+| foreground | string/integer | Text color |
+| background | string/integer | Background color |
+| underline  | string/integer | Underline color |
+
+### Selected Scheme
+**The currently active tag.**
+
+```lua
+oxwm.bar.set_scheme_selected(foreground, background, underline)
+```
+
+| Parameter  | Type           | Description |
+|------------|----------------|-------------|
+| foreground | string/integer | Text color |
+| background | string/integer | Background color |
+| underline  | string/integer | Underline color |
+
+**Complete Example:**
+```lua
+local colors = {
+    fg = "#bbbbbb",
+    bg = "#1a1b26",
+    cyan = "#0db9d7",
+    purple = "#ad8ee6",
+}
+
+-- Normal: empty, unselected tags
+oxwm.bar.set_scheme_normal(colors.fg, colors.bg, "#444444")
+
+-- Occupied: tags with windows, but unselected
+oxwm.bar.set_scheme_occupied(colors.cyan, colors.bg, colors.cyan)
+
+-- Selected: currently active tag
+oxwm.bar.set_scheme_selected(colors.cyan, colors.bg, colors.purple)
+```
+
+## Tips
+
+- **Separators**: Use static blocks with high intervals and no underline for visual organization
+- **Update frequency**: Balance between freshness and CPU usage (1s for clocks, 5s for system stats, 999999999 for static data)
+- **Color consistency**: Use a color palette table to maintain consistent theming
+- **Nerd Font icons**: Enhance visual appeal with icons (requires a Nerd Font installed)
+- **Block ordering**: Blocks appear left-to-right in the order you add them

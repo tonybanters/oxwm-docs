@@ -1,148 +1,135 @@
 ---
 title: Quick Start
-description: Get up and running with oxwm
+description: Get up and running with OXWM in minutes
 ---
 
-This guide will help you get started with oxwm after installation.
+This guide will get you up and running with OXWM quickly.
 
-## Basic Concepts
+## First Launch
 
-### Tags (Workspaces)
+After [installing OXWM](/getting-started/installation/), simply start it:
 
-oxwm uses **tags** instead of traditional workspaces. By default, you have 9 tags (labeled 1-9). Windows can belong to multiple tags simultaneously, and you can view one or more tags at once.
+```bash
+# From your .xinitrc
+exec oxwm
 
-- Switch to tag: `Mod+1` through `Mod+9`
-- Move window to tag: `Mod+Shift+1` through `Mod+Shift+9`
+# Or select OXWM from your display manager
+```
 
-### Layouts
+On first launch, OXWM automatically creates a default configuration at `~/.config/oxwm/config.lua`.
 
-oxwm supports two layout modes:
+## Understanding the Config
 
-- **Tiling**: Master window on the left (50% width), stack windows on the right
-- **Normie (Floating)**: Windows float freely like a traditional window manager
-
-Toggle between layouts:
-- `Mod+C` - Switch to tiling layout
-- `Mod+F` - Switch to floating layout
-- Toggle individual window floating: `Mod+Shift+Space`
-
-### Modkey
-
-By default, the modkey is `Mod4` (Super/Windows key). All keybindings use this as the primary modifier.
-
-You can change this in your config file to `Mod1` (Alt) or other modifiers.
-
-## Essential Keybindings
-
-Here are the most important keybindings to get started (assuming default `Mod4`/Super key):
-
-### Applications
-
-| Keybinding | Action |
-|------------|--------|
-| `Mod+Return` | Launch terminal |
-| `Mod+D` | Open dmenu (application launcher) |
-| `Mod+Q` | Close focused window |
-
-### Window Navigation
-
-| Keybinding | Action |
-|------------|--------|
-| `Mod+J` | Focus next window (down in stack) |
-| `Mod+K` | Focus previous window (up in stack) |
-| `Mod+Shift+J` | Swap with next window |
-| `Mod+Shift+K` | Swap with previous window |
-
-### Tags (Workspaces)
-
-| Keybinding | Action |
-|------------|--------|
-| `Mod+1` to `Mod+9` | Switch to tag 1-9 |
-| `Mod+Shift+1` to `Mod+Shift+9` | Move window to tag 1-9 |
-
-### Layout Management
-
-| Keybinding | Action |
-|------------|--------|
-| `Mod+Shift+Space` | Toggle floating for current window |
-| `Mod+Shift+F` | Toggle fullscreen |
-| `Mod+A` | Toggle gaps |
-
-### Multi-Monitor
-
-| Keybinding | Action |
-|------------|--------|
-| `Mod+,` | Focus left monitor |
-| `Mod+.` | Focus right monitor |
-
-### System
-
-| Keybinding | Action |
-|------------|--------|
-| `Mod+Shift+R` | Reload configuration |
-| `Mod+Shift+Q` | Quit oxwm |
-
-## Your First Session
-
-1. **Log in to oxwm** using your display manager or `startx`
-
-2. **Open a terminal**: Press `Mod+Return` (Super+Enter)
-
-3. **Launch applications**: Press `Mod+D` to open dmenu, then type an application name
-
-4. **Navigate windows**: Use `Mod+J` and `Mod+K` to cycle through windows
-
-5. **Try different tags**: Press `Mod+2` to switch to tag 2, `Mod+3` for tag 3, etc.
-
-6. **Move windows between tags**: Focus a window, then press `Mod+Shift+3` to move it to tag 3
-
-7. **Experiment with layouts**: Open multiple windows and use `Mod+Shift+Space` to make some float
-
-## Customizing Your Setup
-
-The configuration file is located at `~/.config/oxwm/config.lua`.
-
-### Change Your Terminal
-
-Edit the `terminal` field:
+OXWM uses a clean, functional Lua API. Here's what your initial config looks like:
 
 ```lua
-terminal = "alacritty",  -- or "kitty", "wezterm", etc.
+-- Set basic options
+oxwm.set_terminal("st")
+oxwm.set_modkey("Mod4")  -- Mod4 = Super/Windows key
+oxwm.set_tags({ "1", "2", "3", "4", "5", "6", "7", "8", "9" })
+
+-- Configure borders
+oxwm.border.set_width(2)
+oxwm.border.set_focused_color("#6dade3")
+oxwm.border.set_unfocused_color("#bbbbbb")
+
+-- Configure gaps
+oxwm.gaps.set_enabled(true)
+oxwm.gaps.set_inner(5, 5)  -- horizontal, vertical
+oxwm.gaps.set_outer(5, 5)
+
+-- Set up keybindings
+oxwm.key.bind({ "Mod4" }, "Return", oxwm.spawn("st"))
+oxwm.key.bind({ "Mod4" }, "Q", oxwm.client.kill())
+```
+
+## Default Keybindings
+
+| Keybinding | Action |
+|------------|--------|
+| `Mod+Return` | Spawn terminal |
+| `Mod+D` | Launch dmenu |
+| `Mod+Q` | Close window |
+| `Mod+Shift+Q` | Quit OXWM |
+| `Mod+Shift+R` | Reload config (hot-reload!) |
+| `Mod+H/J/K/L` | Focus window (vim-style) |
+| `Mod+Shift+H/J/K/L` | Swap windows |
+| `Mod+1-9` | Switch to tag |
+| `Mod+Shift+1-9` | Move window to tag |
+| `Mod+A` | Toggle gaps |
+| `Mod+Shift+F` | Toggle fullscreen |
+| `Mod+Shift+Space` | Toggle floating |
+| `Mod+Shift+/` | Show keybind overlay |
+
+## Making Your First Edit
+
+1. Open your config:
+   ```bash
+   $EDITOR ~/.config/oxwm/config.lua
+   ```
+
+2. Change your terminal (example):
+   ```lua
+   oxwm.set_terminal("alacritty")  -- or kitty, wezterm, etc.
+   ```
+
+3. Save and press `Mod+Shift+R` to reload!
+
+Your change takes effect **instantly** without restarting X.
+
+## LSP Support & Autocomplete
+
+OXWM includes full LSP support with type definitions. If you use a Lua language server:
+
+1. The `oxwm.lua` file is automatically installed to `~/.config/oxwm/`
+2. Your editor will provide autocomplete and documentation for all `oxwm.*` functions
+3. Set up your editor (see [LSP Setup Guide](/guides/lsp-setup/))
+
+## Next Steps
+
+- [Configuration Basics](/configuration/basics/) - Learn about all configuration options
+- [Bar Configuration](/configuration/bar/) - Customize your status bar
+- [Keybindings](/configuration/keybindings/) - Set up custom keyboard shortcuts
+- [API Reference](/api-reference/core/) - Complete API documentation
+- [Hot Reload Guide](/guides/hot-reload/) - Master instant configuration changes
+
+## Common Customizations
+
+### Change Your Modkey
+
+```lua
+-- Use Alt instead of Super
+oxwm.set_modkey("Mod1")
+
+-- Available modkeys: Mod1 (Alt), Mod4 (Super), Control, Shift
+```
+
+### Disable Gaps
+
+```lua
+oxwm.gaps.set_enabled(false)
 ```
 
 ### Change Border Colors
 
 ```lua
-border_focused = "#6dade3",    -- Blue when focused
-border_unfocused = "#bbbbbb",  -- Gray when unfocused
+-- Hex strings
+oxwm.border.set_focused_color("#ff0000")    -- Red
+oxwm.border.set_unfocused_color("#666666")  -- Gray
+
+-- Or hex integers
+oxwm.border.set_focused_color(0xff0000)
 ```
 
-### Adjust Gaps
+### Add a Keybinding
 
 ```lua
-gap_inner_horizontal = 5,
-gap_inner_vertical = 5,
-gap_outer_horizontal = 5,
-gap_outer_vertical = 5,
+-- Launch Firefox with Mod+B
+oxwm.key.bind({ "Mod4" }, "B", oxwm.spawn("firefox"))
 ```
-
-### Reload Configuration
-
-After making changes, press `Mod+Shift+R` to reload the config without restarting your session.
-
-## Next Steps
-
-- Learn more about [configuration options](/configuration/overview/)
-- Explore [keybinding customization](/configuration/keybindings/)
-- Set up your [status bar](/configuration/status-bar/)
-- View the complete [keybindings reference](/reference/keybindings/)
 
 ## Getting Help
 
-If you encounter issues:
-
-1. Check that your config file syntax is valid (Lua format)
-2. Test your config syntax: `lua -c ~/.config/oxwm/config.lua`
-3. Look at the default config: `oxwm --init` (backs up existing config)
-4. If migrating from RON: `oxwm --migrate` to convert automatically
-5. Visit the [GitHub repository](https://github.com/tonybanters/oxwm) to report bugs
+- Check the [API Reference](/api-reference/core/) for all available functions
+- Your LSP will show function signatures and documentation
+- Join our community for support

@@ -1,379 +1,284 @@
 ---
 title: Keybindings
 description: Configure custom keyboard shortcuts
+sidebar:
+  order: 4
 ---
 
-oxwm provides powerful and flexible keybinding configuration with support for single-key bindings and multi-key sequences (keychords).
+OXWM provides flexible keybinding configuration using the `oxwm.key.bind()` function.
 
-## Modkey Configuration
+## Basic Keybinding
 
-First, set your primary modifier key:
+Bind a key combination to an action.
 
 ```lua
-modkey = "Mod4",  -- Super/Windows key (recommended)
+oxwm.key.bind({ "Mod4" }, "Return", oxwm.spawn("st"))
 ```
 
-Available modkeys:
+| Parameter  | Type   | Description |
+|------------|--------|-------------|
+| modifiers  | table  | List of modifier keys (e.g., `{ "Mod4" }`, `{ "Mod4", "Shift" }`) |
+| key        | string | Key name (e.g., `"Return"`, `"J"`, `"Space"`) |
+| action     | table  | Action to perform (returned by action functions) |
+
+**Available modifiers:**
 - `Mod1` - Alt key
-- `Mod2` - Num Lock (rarely used)
-- `Mod3` - (rarely used)
 - `Mod4` - Super/Windows key (recommended)
-- `Mod5` - (rarely used)
-- `Shift` - Shift key
 - `Control` - Ctrl key
+- `Shift` - Shift key
 
-You can also use `Mod` as an alias for your configured modkey in keybindings.
+## Actions
 
-## Keybinding Formats
+### Spawn Command
 
-### Single Key Binding
-
-The most common format for simple keybindings:
-
-```lua
-keybindings = {
-    { modifiers = { "Mod4" }, key = "Return", action = "Spawn", arg = "st" },
-    { modifiers = { "Mod4", "Shift" }, key = "Q", action = "Quit" },
-    { modifiers = { "Mod4" }, key = "J", action = "FocusDown" },
-}
-```
-
-**Structure:**
-- `modifiers`: List of modifier keys held down (as strings)
-- `key`: The key to press (as string)
-- `action`: The action to perform (as string)
-- `arg`: Argument for the action (optional, depends on action)
-
-### Keychord (Multi-Key Sequence)
-
-For vim/emacs-style multi-key sequences:
+Execute a shell command.
 
 ```lua
-keybindings = {
-    {
-        keys = {
-            { modifiers = { "Mod4" }, key = "Space" },  -- First: press Mod4+Space
-            { modifiers = { }, key = "T" },             -- Then: press T
-        },
-        action = "Spawn",
-        arg = "st"
-    },
-}
+oxwm.key.bind({ "Mod4" }, "Return", oxwm.spawn("st"))
 ```
 
-Press `Escape` to cancel a keychord sequence midway.
+| Parameter | Type          | Description |
+|-----------|---------------|-------------|
+| command   | string/table  | Command to execute (string for simple commands, table for command with args) |
 
-## Available Modifiers
-
-You can combine multiple modifiers:
+**Examples:**
 
 ```lua
--- Single modifier
-{ modifiers = { "Mod4" }, key = "Return", action = "Spawn", arg = "st" },
+-- Simple command
+oxwm.key.bind({ "Mod4" }, "Return", oxwm.spawn("st"))
 
--- Multiple modifiers
-{ modifiers = { "Mod4", "Shift" }, key = "Q", action = "Quit" },
-{ modifiers = { "Mod4", "Control" }, key = "J", action = "SmartMoveDown" },
+-- Command with arguments
+oxwm.key.bind({ "Mod4" }, "D", oxwm.spawn({ "sh", "-c", "dmenu_run -l 10" }))
+
+-- Complex shell command
+oxwm.key.bind({ "Mod4" }, "S", oxwm.spawn({
+    "sh", "-c", "maim -s | xclip -selection clipboard -t image/png"
+}))
 ```
-
-All available modifiers (as strings):
-- `"Mod"` - Alias for your configured modkey
-- `"Mod1"` - Alt
-- `"Mod2"` - Num Lock
-- `"Mod3"`
-- `"Mod4"` - Super/Windows
-- `"Mod5"`
-- `"Shift"`
-- `"Control"`
-
-## Available Actions
 
 ### Window Management
 
-| Action | Argument | Description |
-|--------|----------|-------------|
-| `Kill` | None | Close focused window |
-| `FocusDown` | None | Focus next window in stack |
-| `FocusUp` | None | Focus previous window in stack |
-| `SwapDown` | None | Swap with next window |
-| `SwapUp` | None | Swap with previous window |
-| `Exchange` | None | Exchange master and stack windows |
-| `ToggleFloating` | None | Toggle floating for current window |
-| `ToggleFullscreen` | None | Toggle fullscreen mode |
+```lua
+oxwm.key.bind({ "Mod4" }, "Q", oxwm.client.kill())
+oxwm.key.bind({ "Mod4" }, "J", oxwm.client.focus_down())
+oxwm.key.bind({ "Mod4" }, "K", oxwm.client.focus_up())
+```
+
+| Function | Description |
+|----------|-------------|
+| `oxwm.client.kill()` | Close focused window |
+| `oxwm.client.focus_down()` | Focus next window in stack |
+| `oxwm.client.focus_up()` | Focus previous window in stack |
+| `oxwm.client.swap_down()` | Swap with next window |
+| `oxwm.client.swap_up()` | Swap with previous window |
+| `oxwm.client.toggle_floating()` | Toggle floating mode |
+| `oxwm.client.toggle_fullscreen()` | Toggle fullscreen mode |
 
 ### Smart Window Movement
 
-These actions intelligently move windows considering monitor boundaries:
+Move windows across monitor boundaries.
 
-| Action | Description |
-|--------|-------------|
-| `SmartMoveUp` | Move window up or to monitor above |
-| `SmartMoveDown` | Move window down or to monitor below |
-| `SmartMoveLeft` | Move window left or to monitor left |
-| `SmartMoveRight` | Move window right or to monitor right |
+```lua
+oxwm.key.bind({ "Mod4", "Control" }, "J", oxwm.client.smart_move_down())
+```
+
+| Function | Description |
+|----------|-------------|
+| `oxwm.client.smart_move_up()` | Move window up or to monitor above |
+| `oxwm.client.smart_move_down()` | Move window down or to monitor below |
+| `oxwm.client.smart_move_left()` | Move window left or to monitor left |
+| `oxwm.client.smart_move_right()` | Move window right or to monitor right |
 
 ### Layout Management
 
-| Action | Argument | Description |
-|--------|----------|-------------|
-| `SetLayoutByName` | Layout name | Switch to specific layout |
-| `NextLayout` | None | Cycle to next layout |
-| `ToggleGaps` | None | Enable/disable gaps |
+```lua
+oxwm.key.bind({ "Mod4" }, "A", oxwm.toggle_gaps())
+oxwm.key.bind({ "Mod4" }, "Space", oxwm.layout.next())
+```
 
-Layout names: `"tiling"`, `"normie"`
+| Function | Description |
+|----------|-------------|
+| `oxwm.toggle_gaps()` | Toggle window gaps on/off |
+| `oxwm.layout.next()` | Cycle to next layout |
+| `oxwm.layout.set("tiling")` | Set specific layout ("tiling" or "normie") |
 
-### Tag (Workspace) Management
+### Tag Management
 
-| Action | Argument | Description |
-|--------|----------|-------------|
-| `ViewTag` | Tag index (0-8) | Switch to tag N |
-| `MoveToTag` | Tag index (0-8) | Move window to tag N |
+```lua
+oxwm.key.bind({ "Mod4" }, "1", oxwm.tag.view(1))
+oxwm.key.bind({ "Mod4", "Shift" }, "1", oxwm.tag.move_client(1))
+```
+
+| Function | Parameter | Description |
+|----------|-----------|-------------|
+| `oxwm.tag.view(index)` | integer | Switch to tag N (1-9) |
+| `oxwm.tag.move_client(index)` | integer | Move focused window to tag N (1-9) |
 
 ### Monitor Management
 
-| Action | Description |
-|--------|-------------|
-| `FocusMonLeft` | Focus monitor to the left |
-| `FocusMonRight` | Focus monitor to the right |
+```lua
+oxwm.key.bind({ "Mod4" }, "Comma", oxwm.focus_monitor(-1))
+oxwm.key.bind({ "Mod4" }, "Period", oxwm.focus_monitor(1))
+```
 
-### System
+| Function | Parameter | Description |
+|----------|-----------|-------------|
+| `oxwm.focus_monitor(index)` | integer | Focus monitor (-1 for previous, 1 for next) |
 
-| Action | Argument | Description |
-|--------|----------|-------------|
-| `Spawn` | Command string | Execute shell command |
-| `Quit` | None | Exit oxwm |
-| `Reload` | None | Reload configuration |
+### System Control
 
-## Complete Keybinding Examples
+```lua
+oxwm.key.bind({ "Mod4", "Shift" }, "R", oxwm.restart())
+oxwm.key.bind({ "Mod4", "Shift" }, "Q", oxwm.quit())
+```
+
+| Function | Description |
+|----------|-------------|
+| `oxwm.restart()` | Reload configuration |
+| `oxwm.quit()` | Exit window manager |
+| `oxwm.recompile()` | Recompile and restart (dev builds only) |
+| `oxwm.show_keybinds()` | Show keybind overlay |
+
+## Complete Examples
 
 ### Basic Window Management
 
 ```lua
-keybindings = {
-    -- Terminal
-    { modifiers = { "Mod4" }, key = "Return", action = "Spawn", arg = "st" },
+-- Terminal
+oxwm.key.bind({ "Mod4" }, "Return", oxwm.spawn("st"))
 
-    -- Application launcher
-    { modifiers = { "Mod4" }, key = "D", action = "Spawn", arg = "dmenu_run" },
+-- Application launcher
+oxwm.key.bind({ "Mod4" }, "D", oxwm.spawn("dmenu_run"))
 
-    -- Close window
-    { modifiers = { "Mod4" }, key = "Q", action = "KillClient" },
+-- Close window
+oxwm.key.bind({ "Mod4" }, "Q", oxwm.client.kill())
 
-    -- Focus navigation
-    { modifiers = { "Mod4" }, key = "J", action = "FocusDown" },
-    { modifiers = { "Mod4" }, key = "K", action = "FocusUp" },
+-- Focus navigation
+oxwm.key.bind({ "Mod4" }, "J", oxwm.client.focus_down())
+oxwm.key.bind({ "Mod4" }, "K", oxwm.client.focus_up())
 
-    -- Window movement
-    { modifiers = { "Mod4", "Shift" }, key = "J", action = "SwapDown" },
-    { modifiers = { "Mod4", "Shift" }, key = "K", action = "SwapUp" },
-    { modifiers = { "Mod4", "Shift" }, key = "H", action = "Exchange" },
-    { modifiers = { "Mod4", "Shift" }, key = "L", action = "Exchange" },
+-- Window movement
+oxwm.key.bind({ "Mod4", "Shift" }, "J", oxwm.client.swap_down())
+oxwm.key.bind({ "Mod4", "Shift" }, "K", oxwm.client.swap_up())
 
-    -- Smart movement
-    { modifiers = { "Mod4", "Control" }, key = "J", action = "SmartMoveDown" },
-    { modifiers = { "Mod4", "Control" }, key = "K", action = "SmartMoveUp" },
-    { modifiers = { "Mod4", "Control" }, key = "H", action = "SmartMoveLeft" },
-    { modifiers = { "Mod4", "Control" }, key = "L", action = "SmartMoveRight" },
-}
+-- Smart movement
+oxwm.key.bind({ "Mod4", "Control" }, "J", oxwm.client.smart_move_down())
+oxwm.key.bind({ "Mod4", "Control" }, "K", oxwm.client.smart_move_up())
+oxwm.key.bind({ "Mod4", "Control" }, "H", oxwm.client.smart_move_left())
+oxwm.key.bind({ "Mod4", "Control" }, "L", oxwm.client.smart_move_right())
 ```
 
 ### Layout and Appearance
 
 ```lua
-keybindings = {
-    -- Toggle floating
-    { modifiers = { "Mod4", "Shift" }, key = "Space", action = "ToggleFloating" },
+-- Toggle floating
+oxwm.key.bind({ "Mod4", "Shift" }, "Space", oxwm.client.toggle_floating())
 
-    -- Toggle fullscreen
-    { modifiers = { "Mod4", "Shift" }, key = "F", action = "ToggleFullscreen" },
+-- Toggle fullscreen
+oxwm.key.bind({ "Mod4", "Shift" }, "F", oxwm.client.toggle_fullscreen())
 
-    -- Toggle gaps
-    { modifiers = { "Mod4" }, key = "A", action = "ToggleGaps" },
+-- Toggle gaps
+oxwm.key.bind({ "Mod4" }, "A", oxwm.toggle_gaps())
 
-    -- Switch layouts
-    { modifiers = { "Mod4" }, key = "C", action = "SetLayoutByName", arg = "tiling" },
-    { modifiers = { "Mod4" }, key = "F", action = "SetLayoutByName", arg = "normie" },
-    { modifiers = { "Mod4" }, key = "N", action = "NextLayout" },
-}
+-- Switch layouts
+oxwm.key.bind({ "Mod4" }, "Space", oxwm.layout.next())
+oxwm.key.bind({ "Mod4" }, "T", oxwm.layout.set("tiling"))
+oxwm.key.bind({ "Mod4" }, "F", oxwm.layout.set("normie"))
 ```
 
-### Tag (Workspace) Bindings
+### Tag Bindings
 
 ```lua
-keybindings = {
-    -- View tags
-    { modifiers = { "Mod4" }, key = "1", action = "ViewTag", arg = 0 },
-    { modifiers = { "Mod4" }, key = "2", action = "ViewTag", arg = 1 },
-    { modifiers = { "Mod4" }, key = "3", action = "ViewTag", arg = 2 },
-    { modifiers = { "Mod4" }, key = "4", action = "ViewTag", arg = 3 },
-    { modifiers = { "Mod4" }, key = "5", action = "ViewTag", arg = 4 },
-    { modifiers = { "Mod4" }, key = "6", action = "ViewTag", arg = 5 },
-    { modifiers = { "Mod4" }, key = "7", action = "ViewTag", arg = 6 },
-    { modifiers = { "Mod4" }, key = "8", action = "ViewTag", arg = 7 },
-    { modifiers = { "Mod4" }, key = "9", action = "ViewTag", arg = 8 },
+-- View tags
+for i = 1, 9 do
+    oxwm.key.bind({ "Mod4" }, tostring(i), oxwm.tag.view(i))
+end
 
-    -- Move to tags
-    { modifiers = { "Mod4", "Shift" }, key = "1", action = "MoveToTag", arg = 0 },
-    { modifiers = { "Mod4", "Shift" }, key = "2", action = "MoveToTag", arg = 1 },
-    { modifiers = { "Mod4", "Shift" }, key = "3", action = "MoveToTag", arg = 2 },
-    { modifiers = { "Mod4", "Shift" }, key = "4", action = "MoveToTag", arg = 3 },
-    { modifiers = { "Mod4", "Shift" }, key = "5", action = "MoveToTag", arg = 4 },
-    { modifiers = { "Mod4", "Shift" }, key = "6", action = "MoveToTag", arg = 5 },
-    { modifiers = { "Mod4", "Shift" }, key = "7", action = "MoveToTag", arg = 6 },
-    { modifiers = { "Mod4", "Shift" }, key = "8", action = "MoveToTag", arg = 7 },
-    { modifiers = { "Mod4", "Shift" }, key = "9", action = "MoveToTag", arg = 8 },
-}
-```
-
-**Note:** Tag indices are 0-based (0-8 for 9 tags), not 1-based.
-
-### Multi-Monitor Bindings
-
-```lua
-keybindings = {
-    -- Focus monitors
-    { modifiers = { "Mod4" }, key = "Comma", action = "FocusMonLeft" },
-    { modifiers = { "Mod4" }, key = "Period", action = "FocusMonRight" },
-}
-```
-
-### System Control
-
-```lua
-keybindings = {
-    -- Reload config
-    { modifiers = { "Mod4", "Shift" }, key = "R", action = "Restart" },
-
-    -- Quit WM
-    { modifiers = { "Mod4", "Shift" }, key = "Q", action = "Quit" },
-}
+-- Move to tags
+for i = 1, 9 do
+    oxwm.key.bind({ "Mod4", "Shift" }, tostring(i), oxwm.tag.move_client(i))
+end
 ```
 
 ### Application Shortcuts
 
 ```lua
-keybindings = {
-    -- Terminal
-    { modifiers = { "Mod4" }, key = "Return", action = "Spawn", arg = "alacritty" },
+-- Terminal
+oxwm.key.bind({ "Mod4" }, "Return", oxwm.spawn("alacritty"))
 
-    -- Browser
-    { modifiers = { "Mod4" }, key = "B", action = "Spawn", arg = "firefox" },
+-- Browser
+oxwm.key.bind({ "Mod4" }, "B", oxwm.spawn("firefox"))
 
-    -- File manager
-    { modifiers = { "Mod4" }, key = "E", action = "Spawn", arg = "thunar" },
+-- File manager
+oxwm.key.bind({ "Mod4" }, "E", oxwm.spawn("thunar"))
 
-    -- Screenshot
-    { modifiers = { "Mod4" }, key = "S", action = "Spawn",
-      arg = { "sh", "-c", "maim -s | xclip -selection clipboard -t image/png" } },
+-- Screenshot
+oxwm.key.bind({ "Mod4" }, "S", oxwm.spawn({
+    "sh", "-c", "maim -s | xclip -selection clipboard -t image/png"
+}))
 
-    -- Lock screen
-    { modifiers = { "Mod4" }, key = "L", action = "Spawn", arg = "i3lock -c 000000" },
-}
+-- Lock screen
+oxwm.key.bind({ "Mod4" }, "L", oxwm.spawn("i3lock -c 000000"))
 ```
 
 ### Media Keys
 
 ```lua
-keybindings = {
-    -- Volume control
-    { modifiers = { }, key = "AudioRaiseVolume", action = "Spawn", arg = "amixer set Master 5%+" },
-    { modifiers = { }, key = "AudioLowerVolume", action = "Spawn", arg = "amixer set Master 5%-" },
-    { modifiers = { }, key = "AudioMute", action = "Spawn", arg = "amixer set Master toggle" },
+-- Volume control
+oxwm.key.bind({}, "AudioRaiseVolume", oxwm.spawn("amixer set Master 5%+"))
+oxwm.key.bind({}, "AudioLowerVolume", oxwm.spawn("amixer set Master 5%-"))
+oxwm.key.bind({}, "AudioMute", oxwm.spawn("amixer set Master toggle"))
 
-    -- Brightness
-    { modifiers = { }, key = "MonBrightnessUp", action = "Spawn", arg = "brightnessctl set +5%" },
-    { modifiers = { }, key = "MonBrightnessDown", action = "Spawn", arg = "brightnessctl set 5%-" },
-}
+-- Brightness
+oxwm.key.bind({}, "MonBrightnessUp", oxwm.spawn("brightnessctl set +5%"))
+oxwm.key.bind({}, "MonBrightnessDown", oxwm.spawn("brightnessctl set 5%-"))
 ```
 
-### Keychord Examples
+### System Control
 
 ```lua
-keybindings = {
-    -- Mod+Space, then T = terminal
-    {
-        keys = {
-            { modifiers = { "Mod4" }, key = "Space" },
-            { modifiers = { }, key = "T" },
-        },
-        action = "Spawn",
-        arg = "st"
-    },
+-- Reload config
+oxwm.key.bind({ "Mod4", "Shift" }, "R", oxwm.restart())
 
-    -- Mod+Space, then B = browser
-    {
-        keys = {
-            { modifiers = { "Mod4" }, key = "Space" },
-            { modifiers = { }, key = "B" },
-        },
-        action = "Spawn",
-        arg = "firefox"
-    },
+-- Quit WM
+oxwm.key.bind({ "Mod4", "Shift" }, "Q", oxwm.quit())
 
-    -- Mod+Space, then Q = quit
-    {
-        keys = {
-            { modifiers = { "Mod4" }, key = "Space" },
-            { modifiers = { }, key = "Q" },
-        },
-        action = "Quit"
-    },
-}
+-- Show keybinds
+oxwm.key.bind({ "Mod4", "Shift" }, "Slash", oxwm.show_keybinds())
 ```
 
 ## Using Variables
 
-Reduce repetition with Lua variables:
+Organize keybindings with Lua variables.
 
 ```lua
-local modkey = "Mod4"
 local terminal = "alacritty"
 local browser = "firefox"
+local modkey = "Mod4"
 
-return {
-    modkey = modkey,
+oxwm.set_modkey(modkey)
 
-    keybindings = {
-        { modifiers = { modkey }, key = "Return", action = "Spawn", arg = terminal },
-        { modifiers = { modkey }, key = "B", action = "Spawn", arg = browser },
-        { modifiers = { modkey, "Shift" }, key = "Q", action = "Quit" },
-    },
-}
+oxwm.key.bind({ modkey }, "Return", oxwm.spawn(terminal))
+oxwm.key.bind({ modkey }, "B", oxwm.spawn(browser))
+oxwm.key.bind({ modkey, "Shift" }, "Q", oxwm.quit())
 ```
 
 ## Available Key Names
 
-See the [Available Keys](/reference/keys/) reference page for a complete list of key names.
-
 Common keys:
 - Letters: `A` through `Z`
-- Numbers: `Key0` through `Key9`
+- Numbers: `1` through `9`, `0`
 - Function: `F1` through `F12`
 - Navigation: `Up`, `Down`, `Left`, `Right`
 - Special: `Return`, `Space`, `Tab`, `Escape`, `Backspace`
 - Media: `AudioRaiseVolume`, `AudioLowerVolume`, `AudioMute`
 - Brightness: `MonBrightnessUp`, `MonBrightnessDown`
+- Punctuation: `Comma`, `Period`, `Slash`, `Backslash`, `Semicolon`
 
 ## Tips
 
-1. **Start with defaults** and modify gradually
-2. **Use keychords** for less common actions to avoid conflicts
-3. **Group related actions** with similar modifiers (e.g., Shift for "reverse" actions)
-4. **Test immediately** with `Mod+Shift+R` after changes
-5. **Keep it memorable** - use patterns that make sense to you
-6. **Document your changes** with comments in your config
-
-## Troubleshooting
-
-### Keybinding not working
-
-1. Check key name is correct (case-sensitive)
-2. Verify modifier names are correct
-3. Ensure no conflicting bindings
-4. Check if the application is capturing the key first
-
-### International keyboards
-
-oxwm uses keysyms, which work with all keyboard layouts. The physical key position matters, not the character it produces in your layout.
-
-For the [default keybindings reference](/reference/keybindings/), visit the Reference section.
+- **Start with defaults** and modify gradually
+- **Test immediately** with `Mod+Shift+R` after changes
+- **Use patterns** - e.g., Shift for "reverse" actions
+- **Group related actions** with similar key combinations
+- **Document your changes** with comments in your config

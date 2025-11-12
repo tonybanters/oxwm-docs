@@ -1,0 +1,235 @@
+---
+title: Configuration Basics
+description: Essential configuration options for OXWM
+sidebar:
+  order: 1
+---
+
+OXWM uses a functional Lua API for configuration. This page covers the core configuration options.
+
+## File Location
+
+Your config is located at:
+```
+~/.config/oxwm/config.lua
+```
+
+On first launch, OXWM automatically creates a default config. You can also regenerate it:
+
+```bash
+oxwm --init
+```
+
+## The Functional API
+
+OXWM uses a clean, functional Lua API:
+
+```lua
+oxwm.set_terminal("st")
+oxwm.set_modkey("Mod4")
+oxwm.border.set_width(2)
+oxwm.gaps.set_enabled(true)
+```
+
+**Benefits:**
+- **Discoverable** - Type `oxwm.` and your LSP shows all available functions
+- **Type-safe** - LSP provides parameter hints and validation
+- **Clean** - Simple function calls, no nested table structures
+
+## Terminal
+
+Set your default terminal emulator.
+
+```lua
+oxwm.set_terminal("st")
+```
+
+| Parameter | Type   | Description |
+|-----------|--------|-------------|
+| terminal  | string | Terminal command (e.g., "st", "alacritty", "kitty", "wezterm") |
+
+Used by the default `Mod+Return` keybinding.
+
+## Modkey
+
+Set your primary modifier key for keybindings.
+
+```lua
+oxwm.set_modkey("Mod4")
+```
+
+| Parameter | Type   | Description |
+|-----------|--------|-------------|
+| modkey    | string | Modifier key name |
+
+**Available modkeys:**
+- `Mod1` - Alt key
+- `Mod4` - Super/Windows key (recommended)
+- `Control` - Ctrl key
+- `Shift` - Shift key
+
+## Tags
+
+Configure workspace tags.
+
+```lua
+oxwm.set_tags({ "1", "2", "3", "4", "5", "6", "7", "8", "9" })
+```
+
+| Parameter | Type  | Description |
+|-----------|-------|-------------|
+| tags      | table | Array of tag names/labels |
+
+**Examples:**
+
+```lua
+-- Numeric tags
+oxwm.set_tags({ "1", "2", "3", "4", "5", "6", "7", "8", "9" })
+
+-- Named tags
+oxwm.set_tags({ "web", "code", "term", "chat", "music" })
+
+-- Icon tags (requires a Nerd Font)
+oxwm.set_tags({ "", "", "", "", "" })
+```
+
+## Layout Symbols
+
+Customize how layout names appear in the status bar.
+
+```lua
+oxwm.set_layout_symbol("tiling", "[T]")
+```
+
+| Parameter | Type   | Description |
+|-----------|--------|-------------|
+| name      | string | Layout name ("tiling" or "normie") |
+| symbol    | string | Symbol to display in bar |
+
+**Examples:**
+
+```lua
+oxwm.set_layout_symbol("tiling", "[T]")
+oxwm.set_layout_symbol("normie", "[F]")
+
+-- With icons
+oxwm.set_layout_symbol("tiling", "")
+oxwm.set_layout_symbol("normie", "")
+```
+
+## Autostart
+
+Launch programs when OXWM starts.
+
+```lua
+oxwm.autostart("picom")
+```
+
+| Parameter | Type   | Description |
+|-----------|--------|-------------|
+| command   | string | Shell command to execute on startup |
+
+**Examples:**
+
+```lua
+oxwm.autostart("picom")
+oxwm.autostart("feh --bg-scale ~/wallpaper.jpg")
+oxwm.autostart("nm-applet")
+```
+
+## Color Format
+
+Colors in OXWM can be specified as hex strings or integers.
+
+```lua
+oxwm.border.set_focused_color("#6dade3")
+oxwm.border.set_focused_color(0x6dade3)  -- Equivalent
+```
+
+Both formats are equivalent - use whichever you prefer.
+
+**Organizing colors with Lua tables:**
+
+```lua
+local colors = {
+    bg = "#1a1b26",
+    fg = "#bbbbbb",
+    blue = "#6dade3",
+    red = "#f7768e",
+    cyan = "#0db9d7",
+    green = "#9ece6a",
+}
+
+-- Use throughout config
+oxwm.border.set_focused_color(colors.blue)
+oxwm.bar.add_block("{}", "DateTime", "%H:%M", 60, colors.cyan, true)
+```
+
+## Complete Example
+
+Here's a minimal but functional config:
+
+```lua
+-- Color palette
+local colors = {
+    fg = "#bbbbbb",
+    bg = "#1a1b26",
+    blue = "#6dade3",
+    cyan = "#0db9d7",
+}
+
+-- Basic settings
+oxwm.set_terminal("alacritty")
+oxwm.set_modkey("Mod4")
+oxwm.set_tags({ "1", "2", "3", "4", "5" })
+
+-- Layout symbols
+oxwm.set_layout_symbol("tiling", "[T]")
+oxwm.set_layout_symbol("normie", "[F]")
+
+-- Borders
+oxwm.border.set_width(2)
+oxwm.border.set_focused_color(colors.blue)
+oxwm.border.set_unfocused_color(colors.fg)
+
+-- Gaps
+oxwm.gaps.set_enabled(true)
+oxwm.gaps.set_inner(5, 5)
+oxwm.gaps.set_outer(5, 5)
+
+-- Bar
+oxwm.bar.set_font("monospace:style=Bold:size=10")
+oxwm.bar.add_block("{}", "DateTime", "%H:%M", 60, colors.cyan, true)
+
+-- Keybindings
+oxwm.key.bind({ "Mod4" }, "Return", oxwm.spawn("alacritty"))
+oxwm.key.bind({ "Mod4" }, "Q", oxwm.client.kill())
+oxwm.key.bind({ "Mod4", "Shift" }, "Q", oxwm.quit())
+oxwm.key.bind({ "Mod4", "Shift" }, "R", oxwm.restart())
+
+-- Autostart
+oxwm.autostart("picom")
+```
+
+## Hot Reloading
+
+After editing your config, press `Mod+Shift+R` to reload instantly without restarting X.
+
+See the [Hot Reload Guide](/guides/hot-reload/) for details.
+
+## LSP Support
+
+OXWM provides full LSP support with the `oxwm.lua` type definition file:
+
+1. Automatically installed to `~/.config/oxwm/oxwm.lua`
+2. Provides autocomplete for all `oxwm.*` functions
+3. Shows parameter types and documentation
+
+See [LSP Setup](/guides/lsp-setup/) for editor configuration.
+
+## Next Steps
+
+- [Appearance Configuration](/configuration/appearance/) - Borders, gaps, fonts
+- [Bar Configuration](/configuration/bar/) - Status bar and blocks
+- [Keybindings](/configuration/keybindings/) - Custom keyboard shortcuts
+- [API Reference](/api-reference/core/) - Complete function documentation

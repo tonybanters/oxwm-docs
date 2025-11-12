@@ -36,20 +36,23 @@ export default defineConfig({
 				{
 					label: 'Configuration',
 					items: [
-						{ label: 'Overview', slug: 'configuration/overview' },
-						{ label: 'Config File Format', slug: 'configuration/format' },
+						{ label: 'Basics', slug: 'configuration/basics' },
+						{ label: 'Bar', slug: 'configuration/bar' },
 						{ label: 'Appearance', slug: 'configuration/appearance' },
 						{ label: 'Keybindings', slug: 'configuration/keybindings' },
-						{ label: 'Status Bar', slug: 'configuration/status-bar' },
 					],
 				},
 				{
-					label: 'Reference',
+					label: 'API Reference',
 					items: [
-						{ label: 'Default Keybindings', slug: 'reference/keybindings' },
-						{ label: 'Available Keys', slug: 'reference/keys' },
-						{ label: 'Key Actions', slug: 'reference/actions' },
-						{ label: 'Status Blocks', slug: 'reference/status-blocks' },
+						{ label: 'Core API', slug: 'api-reference/core' },
+					],
+				},
+				{
+					label: 'Guides',
+					items: [
+						{ label: 'LSP Setup', slug: 'guides/lsp-setup' },
+						{ label: 'Multi-Monitor', slug: 'guides/multi-monitor' },
 					],
 				},
 				{
@@ -57,7 +60,6 @@ export default defineConfig({
 					items: [
 						{ label: 'Building from Source', slug: 'advanced/building' },
 						{ label: 'NixOS Setup', slug: 'advanced/nixos' },
-						{ label: 'Multi-Monitor Setup', slug: 'advanced/multi-monitor' },
 					],
 				},
 			],
